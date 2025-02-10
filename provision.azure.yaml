@@ -1,10 +1,10 @@
 resources:
-  identity: ffc-template-node
+  identity: ffc-ahwr-message-generator
   # postgreSql:
-  #   name: ffc-template-node
+  #   name: ffc-ahwr-message-generator
   #   extensions:
   #     - name: uuid-ossp
   # queues:
-  #   - name: ffc-template-node
+  #   - name: ffc-ahwr-message-generator
   #     role: receiver
 

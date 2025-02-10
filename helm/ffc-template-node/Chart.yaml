@@ -1,6 +1,6 @@
 apiVersion: v2
-description: description-of-project-goes-here
-name: ffc-template-node
+description: Generate and send messages to SFD
+name: ffc-ahwr-message-generator
 # this version is automatically updated in the build pipeline
 version: 1.0.0
 dependencies:

@@ -2,17 +2,16 @@
 # that test output is saved to the host
 
 services:
-  ffc-template-node:
+  ffc-ahwr-message-generator:
     build:
       target: development
-    image: ffc-template-node-development
-    container_name: ffc-template-node-test
+    image: ffc-ahwr-message-generator-development
+    container_name: ffc-ahwr-message-generator-test
     command: npm run test
     volumes:
       - ./app:/home/node/app
       - ./test:/home/node/test
       - ./test-output:/home/node/test-output
-      - ./jest.config.js:/home/node/jest.config.js
+      - ./jest.config.cjs:/home/node/jest.config.cjs
       - ./package.json:/home/node/package.json
-    environment:
-      NODE_OPTIONS: "$NODE_OPTIONS --experimental-vm-modules"
+      - ./jsconfig.json:/home/node/jsconfig.json

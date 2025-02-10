@@ -1,10 +1,10 @@
 # Required values to support CI pipeline
+
 environment: production
-environmentCode:
-name: ffc-template-node
-namespace: ffc-demo
-workstream: ffc-demo
-image: ffc-template-node
+name: ffc-ahwr-message-generator
+namespace: ffc-ahwr
+workstream: ffc-ahwr
+image: ffc-ahwr-message-generator
 
 appInsights:
   connectionString:
