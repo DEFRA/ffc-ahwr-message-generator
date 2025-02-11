@@ -10,10 +10,10 @@ export const getConfig = () => {
   })
 
   const config = {
-    appInsights,
     env: process.env.NODE_ENV || 'development',
     isDev: process.env.NODE_ENV === 'development',
-    port: Number(process.env.PORT) || 3000
+    port: Number(process.env.PORT) || 3000,
+    appInsights
   }
 
   const { error } = schema.validate(config, {
