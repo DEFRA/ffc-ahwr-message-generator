@@ -1,6 +1,12 @@
 import pino from 'hapi-pino'
 
-const transport = { target: 'pino-pretty' }
+const transport = {
+  target: 'pino-pretty',
+  options: {
+    singleLine: true,
+    colorize: true
+  }
+}
 const testLevel = { level: 'silent' }
 
 const req = (request) => ({

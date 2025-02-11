@@ -1,8 +1,8 @@
 import { setup } from './insights.js'
-import { startServer } from './server.js'
+import { createServer } from './server.js'
 
 const init = async () => {
-  const server = await startServer()
+  const server = await createServer()
   await server.start()
   setup(server.logger)
 

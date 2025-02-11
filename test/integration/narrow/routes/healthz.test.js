@@ -1,11 +1,10 @@
-import { startServer } from '../../../../app/server.js'
+import { createServer } from '../../../../app/server.js'
 
-describe('healthz test', () => {
+describe('health endpoints tests', () => {
   let server
 
-  beforeEach(async () => {
-    server = await startServer()
-    await server.initialize()
+  beforeAll(async () => {
+    server = await createServer()
   })
 
   test('GET /healthz route returns 200', async () => {
@@ -18,7 +17,17 @@ describe('healthz test', () => {
     expect(response.statusCode).toBe(200)
   })
 
-  afterEach(async () => {
+  test('GET /healthy route returns 200', async () => {
+    const options = {
+      method: 'GET',
+      url: '/healthy'
+    }
+
+    const response = await server.inject(options)
+    expect(response.statusCode).toBe(200)
+  })
+
+  afterAll(async () => {
     await server.stop()
   })
 })

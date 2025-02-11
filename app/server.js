@@ -4,7 +4,7 @@ import { config } from './config/index.js'
 import { healthRoutes } from './routes/health.js'
 import logger from './logger.js'
 
-export const startServer = async () => {
+export const createServer = async () => {
   const server = hapi.server({
     port: config.port
   })
