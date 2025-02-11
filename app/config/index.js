@@ -6,14 +6,14 @@ export const getConfig = () => {
     appInsights: joi.object(),
     env: joi.string().valid('development', 'test', 'production'),
     isDev: joi.bool(),
-    port: joi.number(),
+    port: joi.number()
   })
 
   const config = {
     appInsights,
     env: process.env.NODE_ENV || 'development',
     isDev: process.env.NODE_ENV === 'development',
-    port: Number(process.env.PORT) || 3000,
+    port: Number(process.env.PORT) || 3000
   }
 
   const { error } = schema.validate(config, {
