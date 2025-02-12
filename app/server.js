@@ -1,28 +1,19 @@
-import Hapi from '@hapi/hapi'
-import Joi from 'joi'
-import { registerPlugins } from './plugins/index.js'
-import config from './config.js'
+import hapi from '@hapi/hapi'
+import joi from 'joi'
+import { config } from './config/index.js'
+import { healthRoutes } from './routes/health.js'
+import logger from './logger.js'
 
-async function createServer () {
-  const server = Hapi.server({
-    host: config.get('host'),
-    port: config.get('port'),
-    routes: {
-      validate: {
-        options: {
-          abortEarly: false
-        }
-      }
-    },
-    router: {
-      stripTrailingSlash: true
-    }
+export const createServer = async () => {
+  const server = hapi.server({
+    port: config.port
   })
 
-  server.validator(Joi)
-  await registerPlugins(server)
+  server.validator(joi)
+
+  await server.register([logger])
+
+  server.route([...healthRoutes])
 
   return server
 }
-
-export { createServer }

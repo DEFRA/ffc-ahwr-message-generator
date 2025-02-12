@@ -3,7 +3,17 @@
 set -e
 projectRoot="$(a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}/; cd "$a/.." || return; pwd)"
 
-service="ffc-template-node"
+service="ffc-ahwr-message-generator"
+
+# Determine which docker compose command is available
+if command -v docker compose &> /dev/null; then
+  compose_cmd="docker compose"
+elif command -v docker-compose &> /dev/null; then
+  compose_cmd="docker-compose"
+else
+  echo "Neither 'docker compose' nor 'docker-compose' is installed." >&2
+  exit 1
+fi
 
 show_help() {
   echo "
@@ -40,19 +50,16 @@ done
 
 compose() {
   if [ "${watch}" = "true" ]; then
-    docker-compose -f docker-compose.yaml -f docker-compose.test.yaml -f docker-compose.test.watch.yaml -p "${service}-test" $@
+    $compose_cmd -f docker-compose.yaml -f docker-compose.test.yaml -f docker-compose.test.watch.yaml -p "${service}-test" "$@"
   elif [ "${debug}" = "true" ]; then
-    docker-compose -f docker-compose.yaml -f docker-compose.test.yaml -f docker-compose.test.watch.yaml -f docker-compose.test.debug.yaml -p "${service}-test" $@
+    $compose_cmd -f docker-compose.yaml -f docker-compose.test.yaml -f docker-compose.test.watch.yaml -f docker-compose.test.debug.yaml -p "${service}-test" "$@"
   else
-    docker-compose -f docker-compose.yaml -f docker-compose.test.yaml -p "${service}-test" $@
+    $compose_cmd -f docker-compose.yaml -f docker-compose.test.yaml -p "${service}-test" "$@"
   fi
 }
 
 (
   cd "${projectRoot}"
-
-  # Create test output folder
-  mkdir -p test-output
 
   # Guarantee clean environment
   compose down -v
@@ -64,7 +71,7 @@ compose() {
   if [ "${debug}" = "true" ]; then
     compose run --service-ports ${service} ${command}
   else
-    compose run --rm ${service} ${command}
+    compose run ${service} ${command}
   fi
 
   # Clean up

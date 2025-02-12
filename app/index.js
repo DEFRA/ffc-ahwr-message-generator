@@ -1,17 +1,27 @@
 import { setup } from './insights.js'
-import 'log-timestamp'
 import { createServer } from './server.js'
 
 const init = async () => {
   const server = await createServer()
   await server.start()
-  console.log('Server running on %s', server.info.uri)
+  setup(server.logger)
+
+  server.logger.info(`Server running on ${server.info.uri}`)
+
+  process.on('unhandledRejection', async (err) => {
+    server.logger.error(err, 'unhandledRejection')
+    process.exit(1)
+  })
+
+  process.on('SIGTERM', async () => {
+    server.logger.error('SIGTERM')
+    process.exit(0)
+  })
+
+  process.on('SIGINT', async () => {
+    server.logger.error('SIGINT')
+    process.exit(0)
+  })
 }
 
-process.on('unhandledRejection', (err) => {
-  console.log(err)
-  process.exit(1)
-})
-
-setup()
 init()
