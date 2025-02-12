@@ -35,7 +35,7 @@ const err = (error) => ({
 
 const plugin = pino
 const options = {
-  name: 'ffc-ahwr-sfd-messaging-proxy',
+  name: 'ffc-ahwr-message-generator',
   ...(process.env.NODE_ENV === 'test' && testLevel),
   formatters: {
     level: (level) => ({ level })
