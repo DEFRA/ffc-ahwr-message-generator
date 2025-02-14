@@ -1,2 +1,9 @@
 resources:
   identity: ahwr-message-generator
+  queues:
+    - name: ffc-ahwr-message-generator
+      role: receiver
+      session: false
+    - name: ffc-ahwr-sfd-message
+      role: sender
+      session: false
