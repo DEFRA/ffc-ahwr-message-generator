@@ -11,17 +11,35 @@ appInsights:
 
 labels: {}
 
-containerConfigMap: {}
+containerConfigMap:
+  name: ffc-ahwr-message-generator-config-map
 
-containerSecret: {}
+containerSecret:
+  name: ffc-ahwr-message-generator-container-secret
+  type: Opaque
 
-deployment: {}
+deployment:
+  cpuThreshold: 80
+  memoryThreshold: 80
+  minReadySeconds: 0
+  minReplicas: 1
+  maxReplicas: 1
+  priorityClassName: default
+  restartPolicy: Always
+  replicas: 1
 
 port: &port 3000
 
 container:
-  resourceTier: M
+  imagePullPolicy: IfNotPresent
+  requestMemory: 100Mi
+  requestCpu: 100m
+  limitMemory: 200Mi
+  limitCpu: 200m
   port: *port
+  messageQueueHost: namespace.servicebus.windows.net
+  messageGeneratorQueueAddress: ffc-ahwr-message-generator
+  sfdMessageQueueAddress: ffc-ahwr-sfd-message
 
 livenessProbe:
   path: /healthz
@@ -42,5 +60,6 @@ readinessProbe:
 workloadIdentity: true
 
 azureIdentity:
+  enabled: true
   clientID: not-a-real-clientID
   resourceID: not-a-real-resourceID

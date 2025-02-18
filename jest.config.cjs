@@ -13,8 +13,7 @@ module.exports = {
     '<rootDir>/node_modules/',
     '<rootDir>/test-output/',
     '<rootDir>/test/',
-    '<rootDir>/rename.js',
-    '<rootDir>/jest.config.js'
+    '<rootDir>/jest.config.cjs'
   ],
   modulePathIgnorePatterns: [
     'node_modules'
@@ -29,6 +28,9 @@ module.exports = {
         outputName: 'junit.xml'
       }
     ]
+  ],
+  setupFilesAfterEnv: [
+    '<rootDir>/test/setup.js'
   ],
   testEnvironment: 'node',
   transform: {

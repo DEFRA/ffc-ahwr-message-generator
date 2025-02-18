@@ -1,16 +1,17 @@
 import { MessageReceiver } from 'ffc-messaging'
-import { config } from '../config/index.js'
+import { messageQueueConfig } from '../config/message-queue.js'
+import { processMessage } from './message-processor.js'
 
 let messageReceiver
 
 export const startMessageReceiver = async (logger) => {
-  const messageAction = (_message) => {
+  const messageAction = (message) => {
     const childLogger = logger.child({})
-    childLogger.setBindings({ info: 'Message received' })
+    processMessage(childLogger, message, messageReceiver)
   }
 
   messageReceiver = new MessageReceiver(
-    config.messageGeneratorQueue,
+    messageQueueConfig.messageGeneratorQueue,
     messageAction
   )
 
