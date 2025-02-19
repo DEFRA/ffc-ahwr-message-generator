@@ -4,4 +4,7 @@ data:
   NODE_ENV: {{ .Values.environment | quote }}
   PORT: {{ .Values.container.port | quote }}
   APPINSIGHTS_CLOUDROLE: {{ .Chart.Name | quote }}
+  MESSAGE_QUEUE_HOST: {{ quote .Values.container.messageQueueHost }}
+  MESSAGE_GENERATOR_QUEUE_ADDRESS: {{ quote .Values.container.messageGeneratorQueueAddress }}
+  SFD_MESSAGE_QUEUE_ADDRESS: {{ quote .Values.container.sfdMessageQueueAddress }}
 {{- end -}}

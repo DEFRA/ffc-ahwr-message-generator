@@ -7,6 +7,8 @@ services:
       target: development
     image: ffc-ahwr-message-generator-development
     container_name: ffc-ahwr-message-generator-development
+    environment:
+      USE_PRETTY_PRINT: ${USE_PRETTY_PRINT:-true}
     ports:
       - "3008:3000"
       - "9238:9229"

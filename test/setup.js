@@ -1,0 +1,5 @@
+process.env.MESSAGE_GENERATOR_QUEUE_ADDRESS = 'message-generator-queue'
+process.env.SFD_MESSAGE_QUEUE_ADDRESS = 'sfd-queue'
+process.env.MESSAGE_QUEUE_HOST = 'host'
+process.env.MESSAGE_QUEUE_USER = 'user'
+process.env.MESSAGE_QUEUE_PASSWORD = 'pass'
