@@ -41,6 +41,13 @@ container:
   messageGeneratorQueueAddress: ffc-ahwr-message-generator
   sfdMessageQueueAddress: ffc-ahwr-sfd-message
 
+postgresService:
+  postgresDb: ffc-ahwr-message-generator
+  postgresqlHost: namespace.postgres.database.azure.com
+  postgresPort: 5432
+  postgresSchema: public
+  postgresUser: postgres
+
 livenessProbe:
   path: /healthz
   port: *port

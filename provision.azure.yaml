@@ -1,5 +1,9 @@
 resources:
   identity: ahwr-message-generator
+  postgreSql:
+    name: ffc-ahwr-message-generator
+    extensions:
+      - name: uuid-ossp
   queues:
     - name: ffc-ahwr-message-generator
       role: receiver
