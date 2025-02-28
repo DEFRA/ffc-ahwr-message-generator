@@ -7,8 +7,8 @@ data:
   MESSAGE_QUEUE_HOST: {{ quote .Values.container.messageQueueHost }}
   MESSAGE_GENERATOR_QUEUE_ADDRESS: {{ quote .Values.container.messageGeneratorQueueAddress }}
   SFD_MESSAGE_QUEUE_ADDRESS: {{ quote .Values.container.sfdMessageQueueAddress }}
-  POSTGRES_DB: { { quote .Values.postgresService.postgresDb } }
-  POSTGRES_HOST: { { quote .Values.postgresService.postgresqlHost } }
-  POSTGRES_PORT: { { quote .Values.postgresService.postgresPort } }
-  POSTGRES_SCHEMA_NAME: { { quote .Values.postgresService.postgresSchema } }
+  POSTGRES_DB: {{ quote .Values.postgresService.postgresDb }}
+  POSTGRES_HOST: {{ quote .Values.postgresService.postgresqlHost }}
+  POSTGRES_PORT: {{ quote .Values.postgresService.postgresPort }}
+  POSTGRES_SCHEMA_NAME: {{ quote .Values.postgresService.postgresSchema }}
 {{- end -}}
