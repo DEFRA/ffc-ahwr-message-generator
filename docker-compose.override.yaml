@@ -15,10 +15,12 @@ services:
     volumes:
       - ./app:/home/node/app
       - ./package.json:/home/node/package.json
-    networks:
-      - ffc-ahwr-message-generator
 
-networks:
-  ffc-ahwr-message-generator:
-    name: ffc-ahwr-message-generator
-    driver: bridge
+  ffc-ahwr-message-generator-postgres:
+    ports:
+      - "5438:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
