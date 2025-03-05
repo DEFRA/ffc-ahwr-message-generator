@@ -25,8 +25,7 @@ describe('validateStatusMessageRequest', () => {
   })
 
   describe('invalid input message produce validation error', () => {
-
-    function expectFalseyResultAndValidationErrorSetInLogBinding(message) {
+    function expectFalseyResultAndValidationErrorSetInLogBinding (message) {
       expect(validateStatusMessageRequest(mockedLogger, message)).toBeFalsy()
       expect(mockSetBindingsLogger).toHaveBeenCalledTimes(1)
       expect(mockSetBindingsLogger).toHaveBeenCalledWith({
@@ -73,10 +72,9 @@ describe('validateStatusMessageRequest', () => {
   })
 
   test('CRN is optional, validation returns true when missing', () => {
-    const stillValidMessage = { ...validInputMessage}
+    const stillValidMessage = { ...validInputMessage }
     delete stillValidMessage.crn
     expect(validateStatusMessageRequest(mockedLogger, stillValidMessage)).toBeTruthy()
     expect(mockSetBindingsLogger).toHaveBeenCalledTimes(0)
   })
-
 })
