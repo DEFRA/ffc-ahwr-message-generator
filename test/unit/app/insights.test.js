@@ -9,11 +9,11 @@ const mockStart = jest.fn()
 
 jest.mock('applicationinsights', () => {
   return {
-    setup: jest.fn(() => {
+    setup: () => {
       return {
         start: mockStart
       }
-    }),
+    },
     defaultClient: {
       context: {
         keys: {
@@ -26,13 +26,8 @@ jest.mock('applicationinsights', () => {
 })
 
 describe('Application Insights', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
   test('sets up insights when the connection string env var is defined', () => {
-    const appName = 'test-app'
-    process.env.APPINSIGHTS_CLOUDROLE = appName
+    process.env.APPINSIGHTS_CLOUDROLE = 'test-app'
     process.env.APPINSIGHTS_CONNECTIONSTRING = 'something'
 
     setup(mockedLogger)

@@ -14,9 +14,6 @@ MessageReceiver.prototype.subscribe = mockSubscribe
 MessageReceiver.prototype.closeConnection = mockClose
 
 describe('message receiver', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
   test('subscribes to message receiver and sets log binding', async () => {
     await startMessageReceiver(mockedLogger)
     expect(mockSubscribe).toHaveBeenCalledTimes(1)
