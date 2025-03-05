@@ -1,7 +1,14 @@
 import * as util from 'util'
+import { validateStatusMessageRequest } from './validate-inbound-message.js'
 
 export async function processMessage (logger, message, messageReceiver) {
-  // For now we just print out receipt of message
-  logger.info(`Message received ${util.inspect(message.body)}`)
-  await messageReceiver.completeMessage(message)
+
+  if (validateStatusMessageRequest(logger, message.body)) {
+    logger.info(`Status update message received ${util.inspect(message.body)}`)
+    await messageReceiver.completeMessage(message)
+  } else {
+    logger.warn('Unsupported message received')
+    await messageReceiver.deadLetterMessage(message)
+  }
+
 }
