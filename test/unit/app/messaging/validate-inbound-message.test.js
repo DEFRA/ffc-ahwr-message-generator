@@ -15,10 +15,6 @@ const validInputMessage = {
 }
 
 describe('validateStatusMessageRequest', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   test('returns true if the validation is successful', () => {
     expect(validateStatusMessageRequest(mockedLogger, validInputMessage)).toBeTruthy()
     expect(mockSetBindingsLogger).toHaveBeenCalledTimes(0)

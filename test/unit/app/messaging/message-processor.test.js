@@ -16,10 +16,6 @@ const mockMessageReceiver = {
 }
 
 describe('process Message', () => {
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
   test('processes the message and mark as completed when validation passes', async () => {
     validateStatusMessageRequest.mockReturnValueOnce(true)
     const event = {
