@@ -10,7 +10,7 @@ const validInputMessage = {
   sbi: 105000003,
   agreementReference: 'IAHW-ABCD-3FGH',
   claimReference: 'FUDC-N87C-PIN5',
-  claimStatus: '2',
+  claimStatus: 2,
   dateTime: new Date()
 }
 
