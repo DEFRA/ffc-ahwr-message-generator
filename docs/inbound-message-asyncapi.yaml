@@ -40,7 +40,7 @@ channels:
               minLength: 14
               maxLength: 14
             claimStatus:
-              type: string
+              type: integer
               description: Claim status identifier.
             dateTime:
               type: string
