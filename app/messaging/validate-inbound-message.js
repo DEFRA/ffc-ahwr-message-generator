@@ -14,7 +14,7 @@ const inboundStatusMessageSchema = joi.object({
   sbi,
   agreementReference: joi.string().required().length(REFERENCE_LENGTH),
   claimReference: joi.string().required().length(REFERENCE_LENGTH),
-  claimStatus: joi.string().required(),
+  claimStatus: joi.number().required(),
   dateTime: joi.date().iso().required()
 })
 
