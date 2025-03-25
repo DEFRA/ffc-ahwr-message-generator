@@ -18,7 +18,6 @@ const processInCheckStatusMessage = async (message, logger) => {
   }
   const { claimStatus, agreementReference, claimReference, sbi, crn } = message.body
   const messageType = `statusChange-${claimStatus}`
-
   const messageGenerate = await getByClaimRefAndMessageType(claimReference, messageType)
 
   if (!messageGenerate) {
