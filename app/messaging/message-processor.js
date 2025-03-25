@@ -5,39 +5,46 @@ import { config } from '../config/index.js'
 import { getByClaimRefAndMessageType, set } from '../repositories/message-generate-repository.js'
 import { sendEvidenceEmail } from '../email/evidence-email.js'
 
+const processInCheckStatusMessage = async (message, logger) => {
+  if (!config.evidenceEmail.enabled) {
+    return
+  }
+  const { claimStatus, agreementReference, claimReference, sbi, crn } = message.body
+
+  const messageType = `statusChange-${claimStatus}`
+  const messageGenerate = await getByClaimRefAndMessageType(claimReference, messageType)
+
+  if (!messageGenerate) {
+    const contactDetails = await getLatestContactDetails(agreementReference, logger)
+
+    await sendEvidenceEmail({
+      ...contactDetails,
+      agreementReference,
+      claimReference,
+      crn,
+      sbi
+    }, logger)
+
+    await set({
+      agreementReference,
+      claimReference,
+      messageType,
+      data: {
+        ...contactDetails
+      }
+    })
+  } else {
+    logger.info(`Message has already been processed with status: ${claimStatus}`)
+  }
+}
+
 export async function processMessage (logger, message, messageReceiver) {
   logger.info('Status update message received')
   logger.debug(message.body)
 
   if (validateStatusMessageRequest(logger, message.body)) {
-    const { claimStatus, agreementReference, claimReference, sbi, crn } = message.body
-
-    if (claimStatus === CLAIM_STATUS.IN_CHECK && config.evidenceEmail.enabled) {
-      const messageType = `statusChange-${claimStatus}`
-      const messageGenerate = await getByClaimRefAndMessageType(claimReference, messageType)
-
-      if (!messageGenerate) {
-        const contactDetails = await getLatestContactDetails(agreementReference, logger)
-
-        await sendEvidenceEmail({
-          ...contactDetails,
-          agreementReference,
-          claimReference,
-          crn,
-          sbi
-        }, logger)
-
-        await set({
-          agreementReference,
-          claimReference,
-          messageType,
-          data: {
-            ...contactDetails
-          }
-        })
-      } else {
-        logger.info(`Message has already been processed with status: ${claimStatus}`)
-      }
+    if (message.body.claimStatus === CLAIM_STATUS.IN_CHECK) {
+      await processInCheckStatusMessage(message, logger)
     }
 
     await messageReceiver.completeMessage(message)
@@ -46,14 +53,3 @@ export async function processMessage (logger, message, messageReceiver) {
     await messageReceiver.deadLetterMessage(message)
   }
 }
-
-/*
-
-  crn,
-  sbi,
-  agreementReference: joi.string().required().length(REFERENCE_LENGTH),
-  claimReference: joi.string().required().length(REFERENCE_LENGTH),
-  claimStatus: joi.number().required(),
-  dateTime: joi.date().iso().required()
-ffc-ahwr-message-generator
-*/
