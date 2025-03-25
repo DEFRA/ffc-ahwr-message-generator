@@ -75,14 +75,3 @@ export async function processMessage (logger, message, messageReceiver) {
     await messageReceiver.deadLetterMessage(message)
   }
 }
-
-/*
-
-  crn,
-  sbi,
-  agreementReference: joi.string().required().length(REFERENCE_LENGTH),
-  claimReference: joi.string().required().length(REFERENCE_LENGTH),
-  claimStatus: joi.number().required(),
-  dateTime: joi.date().iso().required()
-ffc-ahwr-message-generator
-*/
