@@ -1,2 +1,1 @@
 container.sfdMessageQueueAddress: queue:ffc-ahwr-sfd-message
-container.eventQueueAddress: queue:ffc-ahwr-event

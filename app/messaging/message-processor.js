@@ -5,8 +5,15 @@ import { config } from '../config/index.js'
 import { getByClaimRefAndMessageType, set } from '../repositories/message-generate-repository.js'
 import { sendEvidenceEmail } from '../email/evidence-email.js'
 
+const AddressType = {
+  ORG_EMAIL: 'orgEmail',
+  EMAIL: 'email',
+  CC: 'CC'
+}
+
 const processInCheckStatusMessage = async (message, logger) => {
   if (!config.evidenceEmail.enabled) {
+    logger.info('Skipping sending evidence email as feature flag is not enabled')
     return
   }
   const { claimStatus, agreementReference, claimReference, sbi, crn } = message.body
@@ -16,14 +23,26 @@ const processInCheckStatusMessage = async (message, logger) => {
 
   if (!messageGenerate) {
     const contactDetails = await getLatestContactDetails(agreementReference, logger)
-
-    await sendEvidenceEmail({
-      ...contactDetails,
+    const { email, orgEmail } = contactDetails
+    const requestParams = {
       agreementReference,
       claimReference,
       crn,
-      sbi
-    }, logger)
+      sbi,
+      logger
+    }
+
+    if (config.carbonCopyEmailAddress) {
+      await sendEvidenceEmail({ ...requestParams, emailAddress: config.carbonCopyEmailAddress, addressType: AddressType.CC })
+    }
+
+    if (orgEmail) {
+      await sendEvidenceEmail({ ...requestParams, emailAddress: orgEmail, addressType: AddressType.ORG_EMAIL })
+    }
+
+    if (email && email !== orgEmail) {
+      await sendEvidenceEmail({ ...requestParams, emailAddress: email, addressType: AddressType.EMAIL })
+    }
 
     await set({
       agreementReference,

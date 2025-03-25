@@ -40,8 +40,7 @@ container:
   messageQueueHost: namespace.servicebus.windows.net
   messageGeneratorQueueAddress: ffc-ahwr-message-generator
   sfdMessageQueueAddress: ffc-ahwr-sfd-message
-  eventQueueAddress: ffc-ahwr-event
-  evidenceEmailEnabled:
+  evidenceEmailEnabled: false
   applicationApiUri:
 
 postgresService:

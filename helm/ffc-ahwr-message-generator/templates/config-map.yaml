@@ -5,7 +5,6 @@ data:
   PORT: {{ .Values.container.port | quote }}
   APPINSIGHTS_CLOUDROLE: {{ .Chart.Name | quote }}
   APPLICATION_API_URI: {{ quote .Values.container.applicationApiUri }}
-  EVENT_QUEUE_ADDRESS: {{ quote .Values.container.eventQueueAddress }}
   EVIDENCE_EMAIL_ENABLED: {{ quote .Values.container.evidenceEmailEnabled }}
   MESSAGE_QUEUE_HOST: {{ quote .Values.container.messageQueueHost }}
   MESSAGE_GENERATOR_QUEUE_ADDRESS: {{ quote .Values.container.messageGeneratorQueueAddress }}

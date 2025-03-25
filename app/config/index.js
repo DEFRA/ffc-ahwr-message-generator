@@ -9,7 +9,8 @@ export const getConfig = () => {
     evidenceEmail: {
       enabled: joi.bool()
     },
-    applicationApiUri: joi.string().uri()
+    applicationApiUri: joi.string().uri(),
+    carbonCopyEmailAddress: joi.string().email().allow(null, '')
   })
 
   const config = {
@@ -19,7 +20,8 @@ export const getConfig = () => {
     evidenceEmail: {
       enabled: process.env.EVIDENCE_EMAIL_ENABLED === 'true'
     },
-    applicationApiUri: process.env.APPLICATION_API_URI
+    applicationApiUri: process.env.APPLICATION_API_URI,
+    carbonCopyEmailAddress: process.env.CARBON_COPY_EMAIL_ADDRESS
   }
 
   const { error } = schema.validate(config, {

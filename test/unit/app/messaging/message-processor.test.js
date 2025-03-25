@@ -64,17 +64,26 @@ describe('process Message', () => {
     expect(getLatestContactDetails).toHaveBeenCalledWith('AHWR-0AD3-3322', mockedLogger)
     expect(sendEvidenceEmail).toHaveBeenCalledWith(
       {
-        name: 'Willow Farm',
-        orgEmail: 'willowfarm@gmail.com',
-        farmerName: 'John Jim Doe',
-        email: 'john.doe@gmail.com',
+        addressType: 'orgEmail',
+        emailAddress: 'willowfarm@gmail.com',
         agreementReference: 'AHWR-0AD3-3322',
         claimReference: 'TEMP-O9UD-22F6',
         crn: '1100014934',
-        sbi: '106705779'
-      },
-      mockedLogger
+        sbi: '106705779',
+        logger: mockedLogger
+      }
     )
+    expect(sendEvidenceEmail).toHaveBeenCalledWith(
+      {
+        addressType: 'email',
+        emailAddress: 'john.doe@gmail.com',
+        agreementReference: 'AHWR-0AD3-3322',
+        claimReference: 'TEMP-O9UD-22F6',
+        crn: '1100014934',
+        sbi: '106705779',
+        logger: mockedLogger
+      })
+
     expect(set).toHaveBeenCalledWith({
       agreementReference: 'AHWR-0AD3-3322',
       claimReference: 'TEMP-O9UD-22F6',
@@ -141,7 +150,7 @@ describe('process Message', () => {
 
     expect(validateStatusMessageRequest).toHaveBeenCalledTimes(1)
     expect(mockCompleteMessage).toHaveBeenCalledTimes(1)
-    expect(mockedLogger.info).toHaveBeenCalledTimes(1)
+    expect(mockedLogger.info).toHaveBeenCalledTimes(2)
     expect(getByClaimRefAndMessageType).toHaveBeenCalledTimes(0)
     expect(getLatestContactDetails).toHaveBeenCalledTimes(0)
     expect(sendEvidenceEmail).toHaveBeenCalledTimes(0)

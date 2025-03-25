@@ -17,26 +17,30 @@ const mockLogger = {
 
 describe('sendEvidenceEmail', () => {
   test('should send email and track appInsights success event', async () => {
-    const data = {
-      email: 'test@example.com',
+    const params = {
+      emailAddress: 'test@example.com',
       agreementReference: 'AHWR-0AD3-3322',
       claimReference: 'TEMP-O9UD-22F6',
       crn: '1100014934',
-      sbi: '106705779'
+      sbi: '106705779',
+      logger: mockLogger
     }
 
-    await sendEvidenceEmail(data, mockLogger)
+    await sendEvidenceEmail(params)
 
-    expect(sendSFDEmail).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000', 'test@example.com',
+    expect(sendSFDEmail).toHaveBeenCalledWith(
       {
         crn: '1100014934',
         sbi: '106705779',
-        personalisation: {
+        emailAddress: 'test@example.com',
+        agreementReference: 'AHWR-0AD3-3322',
+        templateId: '550e8400-e29b-41d4-a716-446655440000',
+        customParams: {
           agreementReference: 'AHWR-0AD3-3322',
           claimReference: 'TEMP-O9UD-22F6'
-        }
-      },
-      mockLogger
+        },
+        logger: mockLogger
+      }
     )
     expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith(
       {
@@ -45,7 +49,7 @@ describe('sendEvidenceEmail', () => {
           status: 'success',
           agreementReference: 'AHWR-0AD3-3322',
           claimReference: 'TEMP-O9UD-22F6',
-          email: 'test@example.com',
+          emailAddress: 'test@example.com',
           sbi: '106705779'
         }
       })
@@ -54,14 +58,15 @@ describe('sendEvidenceEmail', () => {
   test('should track an appInisghts exception when email fails to send', async () => {
     const error = new Error('Email send failed')
     sendSFDEmail.mockImplementationOnce(() => { throw error })
-    const data = {
-      email: 'test@example.com',
+    const params = {
+      emailAddress: 'test@example.com',
       agreementReference: 'AGR123',
       claimReference: 'CLM456',
-      sbi: 'SBI789'
+      sbi: 'SBI789',
+      logger: mockLogger
     }
 
-    await expect(sendEvidenceEmail(data, mockLogger)).rejects.toThrow('Email send failed')
+    await expect(sendEvidenceEmail(params)).rejects.toThrow('Email send failed')
 
     expect(appInsights.defaultClient.trackException).toHaveBeenCalledWith({ exception: error })
   })

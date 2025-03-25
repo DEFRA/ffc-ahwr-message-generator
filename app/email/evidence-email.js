@@ -1,21 +1,21 @@
 import appInsights from 'applicationinsights'
 import { sendSFDEmail } from '../lib/sfd-client.js'
 
-export const sendEvidenceEmail = async (data, logger) => {
-  const { email, agreementReference, claimReference, sbi, crn } = data
-  logger.info(`Sending evidence email to ${email}`)
+export const sendEvidenceEmail = async (params) => {
+  const { emailAddress, agreementReference, claimReference, sbi, crn, logger } = params
+  logger.info(`Sending evidence email to ${emailAddress}`)
 
   try {
-    const emailInput = {
-      crn,
-      sbi,
-      personalisation: {
-        agreementReference,
-        claimReference
-      }
+    // update when template available
+    const templateId = '550e8400-e29b-41d4-a716-446655440000'
+    const customParams = {
+      agreementReference,
+      claimReference
     }
-    const templateId = '550e8400-e29b-41d4-a716-446655440000' // TODO replace with real templateId
-    await sendSFDEmail(templateId, email, emailInput, logger)
+
+    await sendSFDEmail({
+      crn, sbi, agreementReference, templateId, emailAddress, customParams, logger
+    })
 
     appInsights.defaultClient?.trackEvent({
       name: 'email',
@@ -23,7 +23,7 @@ export const sendEvidenceEmail = async (data, logger) => {
         status: 'success',
         agreementReference,
         claimReference,
-        email,
+        emailAddress,
         sbi
         // templateId
       }
@@ -31,7 +31,7 @@ export const sendEvidenceEmail = async (data, logger) => {
 
     logger.info('Sent evidence email')
   } catch (e) {
-    logger.error(`Error sending email to ${email}`, JSON.stringify(e.response?.data))
+    logger.error(`Error sending email for agreementReference: ${agreementReference}. Error: ${e}`)
     appInsights.defaultClient.trackException({ exception: e })
     throw e
   }

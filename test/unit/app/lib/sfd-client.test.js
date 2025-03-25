@@ -5,31 +5,32 @@ jest.mock('../../../../app/messaging/schema/submit-sfd-schema', () => ({
   validateSFDSchema: jest.fn()
 }))
 
-const logger = {
+const mockLogger = {
   info: jest.fn()
 }
 
 describe('sendSFDEmail', () => {
-  test('should call validateSFDSchema with the correct message structure', async () => {
+  test('should log SFD message sent when the message is valid', async () => {
     validateSFDSchema.mockReturnValue(true)
-    const templateId = 'template-123'
-    const email = 'test@example.com'
-    const emailInput = {
+    const params = {
       crn: '1100014934',
       sbi: '106705779',
-      personalisation: {
+      agreementReference: 'AHWR-0AD3-3322',
+      templateId: 'template-123',
+      emailAddress: 'test@example.com',
+      customParams: {
         agreementReference: 'AHWR-0AD3-3322',
         claimReference: 'TEMP-O9UD-22F6'
-      }
+      },
+      logger: mockLogger
     }
 
-    await sendSFDEmail(templateId, email, emailInput, logger)
+    await sendSFDEmail(params)
 
     expect(validateSFDSchema).toHaveBeenCalledWith({
       crn: '1100014934',
       sbi: '106705779',
       agreementReference: 'AHWR-0AD3-3322',
-      claimReference: 'TEMP-O9UD-22F6',
       templateId: 'template-123',
       emailAddress: 'test@example.com',
       customParams: {
@@ -38,35 +39,25 @@ describe('sendSFDEmail', () => {
       },
       dateTime: expect.any(String)
     })
-  })
-
-  test('should log a message if validation passes', async () => {
-    validateSFDSchema.mockReturnValue(true)
-
-    await sendSFDEmail('template-123', 'test@example.com', {
-      crn: '1100014934',
-      sbi: '106705779',
-      personalisation: {
-        agreementReference: 'AHWR-0AD3-3322',
-        claimReference: 'TEMP-O9UD-22F6'
-      }
-    }, logger)
-
-    expect(logger.info).toHaveBeenCalledWith('Sent SFD message')
+    expect(mockLogger.info).toHaveBeenCalledWith('Sent SFD message')
   })
 
   test('should not log a message if validation fails', async () => {
     validateSFDSchema.mockReturnValue(false)
-
-    await sendSFDEmail('template-123', 'test@example.com', {
+    const params = {
       crn: '1100014934',
       sbi: '106705779',
-      personalisation: {
+      agreementReference: 'AHWR-0AD3-3322',
+      templateId: 'template-123',
+      customParams: {
         agreementReference: 'AHWR-0AD3-3322',
         claimReference: 'TEMP-O9UD-22F6'
-      }
-    }, logger)
+      },
+      logger: mockLogger
+    }
 
-    expect(logger.info).not.toHaveBeenCalled()
+    await sendSFDEmail(params)
+
+    expect(mockLogger.info).not.toHaveBeenCalled()
   })
 })
