@@ -1,6 +1,6 @@
 # Required values to support CI pipeline
 
-environment: production
+environment: development
 name: ffc-ahwr-message-generator
 namespace: ffc-ahwr
 workstream: ffc-ahwr
