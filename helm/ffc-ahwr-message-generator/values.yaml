@@ -41,7 +41,7 @@ container:
   messageGeneratorQueueAddress: ffc-ahwr-message-generator
   sfdMessageQueueAddress: ffc-ahwr-sfd-message
   evidenceEmailEnabled: false
-  applicationApiUri: dummy
+  applicationApiUri:
 
 postgresService:
   postgresDb: ffc-ahwr-message-generator
