@@ -2,8 +2,8 @@ import appInsights from 'applicationinsights'
 import { sendSFDEmail } from '../lib/sfd-client.js'
 
 export const sendEvidenceEmail = async (params) => {
-  const { emailAddress, agreementReference, claimReference, sbi, crn, logger } = params
-  logger.info(`Sending evidence email to ${emailAddress}`)
+  const { emailAddress, agreementReference, claimReference, sbi, crn, logger, addressType } = params
+  logger.info(`Sending ${addressType} evidence email`)
 
   try {
     // update when template available
@@ -18,20 +18,18 @@ export const sendEvidenceEmail = async (params) => {
     })
 
     appInsights.defaultClient?.trackEvent({
-      name: 'email',
+      name: 'evidence-email-requested',
       properties: {
-        status: 'success',
-        agreementReference,
+        status: true,
         claimReference,
-        emailAddress,
-        sbi
+        addressType
         // templateId
       }
     })
 
-    logger.info('Sent evidence email')
+    logger.info(`Sent ${addressType} evidence email`)
   } catch (e) {
-    logger.error(`Error sending email for agreementReference: ${agreementReference}. Error: ${e}`)
+    logger.error(`Error sending ${addressType} email. Error: ${e}`)
     appInsights.defaultClient.trackException({ exception: e })
     throw e
   }

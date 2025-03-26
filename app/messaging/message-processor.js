@@ -1,5 +1,5 @@
 import { validateStatusMessageRequest } from './validate-inbound-message.js'
-import { CLAIM_STATUS } from '../constants.js'
+import { CLAIM_STATUS } from 'ffc-ahwr-common-library'
 import { getLatestContactDetails } from '../api/application-api.js'
 import { config } from '../config/index.js'
 import { getByClaimRefAndMessageType, set } from '../repositories/message-generate-repository.js'
@@ -62,6 +62,9 @@ export async function processMessage (logger, message, messageReceiver) {
   logger.debug(message.body)
 
   if (validateStatusMessageRequest(logger, message.body)) {
+    const { claimReference, claimStatus } = message.body
+    logger.setBindings({ claimReference, claimStatus })
+
     if (message.body.claimStatus === CLAIM_STATUS.IN_CHECK) {
       await processInCheckStatusMessage(message, logger)
     }

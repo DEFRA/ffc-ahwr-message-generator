@@ -29,7 +29,7 @@
     "joi": "17.13.3",
     "pg": "^8.13.1",
     "sequelize": "^6.37.5",
-    "ffc-ahwr-common-library": "^2.0.2"
+    "ffc-ahwr-common-library": "^2.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.26.8",
