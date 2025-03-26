@@ -3,11 +3,13 @@ import util from 'util'
 
 const nineDigitId = joi.string().pattern(/^\d{9}$/)
 const tenDigitId = joi.string().pattern(/^\d{10}$/)
+const MAX_LENGTH = 320
+const MIN_LENGTH = 1
 const email = joi
   .string()
   .pattern(/^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/)
-  .min(1)
-  .max(320)
+  .min(MIN_LENGTH)
+  .max(MAX_LENGTH)
 
 const submitSFDSchema = joi.object({
   crn: tenDigitId,
