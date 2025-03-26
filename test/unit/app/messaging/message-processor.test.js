@@ -13,7 +13,8 @@ jest.mock('../../../../app/config/index.js', () => ({
   config: {
     evidenceEmail: {
       enabled: true
-    }
+    },
+    carbonCopyEmailAddress: "cc-email@gmail.com"
   }
 }))
 
@@ -34,6 +35,7 @@ const mockMessageReceiver = {
 describe('process Message', () => {
   afterEach(() => {
     config.evidenceEmail.enabled = true
+    config.carbonCopyEmailAddress = "cc-email@gmail.com"
   })
 
   test('should send an evidence email when it is the first time the claim has the status of in check', async () => {
@@ -63,27 +65,33 @@ describe('process Message', () => {
     expect(mockedLogger.info).toHaveBeenCalledTimes(1)
     expect(getByClaimRefAndMessageType).toHaveBeenCalledWith('TEMP-O9UD-22F6', 'statusChange-5')
     expect(getLatestContactDetails).toHaveBeenCalledWith('AHWR-0AD3-3322', mockedLogger)
-    expect(sendEvidenceEmail).toHaveBeenCalledWith(
-      {
-        addressType: 'orgEmail',
-        emailAddress: 'willowfarm@gmail.com',
-        agreementReference: 'AHWR-0AD3-3322',
-        claimReference: 'TEMP-O9UD-22F6',
-        crn: '1100014934',
-        sbi: '106705779',
-        logger: mockedLogger
-      }
-    )
-    expect(sendEvidenceEmail).toHaveBeenCalledWith(
-      {
-        addressType: 'email',
-        emailAddress: 'john.doe@gmail.com',
-        agreementReference: 'AHWR-0AD3-3322',
-        claimReference: 'TEMP-O9UD-22F6',
-        crn: '1100014934',
-        sbi: '106705779',
-        logger: mockedLogger
-      })
+    expect(sendEvidenceEmail).toHaveBeenCalledWith({
+      addressType: 'CC',
+      emailAddress: 'cc-email@gmail.com',
+      agreementReference: 'AHWR-0AD3-3322',
+      claimReference: 'TEMP-O9UD-22F6',
+      crn: '1100014934',
+      sbi: '106705779',
+      logger: mockedLogger
+    })
+    expect(sendEvidenceEmail).toHaveBeenCalledWith({
+      addressType: 'orgEmail',
+      emailAddress: 'willowfarm@gmail.com',
+      agreementReference: 'AHWR-0AD3-3322',
+      claimReference: 'TEMP-O9UD-22F6',
+      crn: '1100014934',
+      sbi: '106705779',
+      logger: mockedLogger
+    })
+    expect(sendEvidenceEmail).toHaveBeenCalledWith({
+      addressType: 'email',
+      emailAddress: 'john.doe@gmail.com',
+      agreementReference: 'AHWR-0AD3-3322',
+      claimReference: 'TEMP-O9UD-22F6',
+      crn: '1100014934',
+      sbi: '106705779',
+      logger: mockedLogger
+    })
 
     expect(set).toHaveBeenCalledWith({
       agreementReference: 'AHWR-0AD3-3322',
@@ -93,6 +101,53 @@ describe('process Message', () => {
         name: 'Willow Farm',
         orgEmail: 'willowfarm@gmail.com',
         farmerName: 'John Jim Doe',
+        email: 'john.doe@gmail.com'
+      }
+    })
+  })
+
+  test('should not send an evidence email to orgEmail and CC when not available', async () => {
+    const event = {
+      body: {
+        crn: '1100014934',
+        sbi: '106705779',
+        agreementReference: 'AHWR-0AD3-3322',
+        claimReference: 'TEMP-O9UD-22F6',
+        claimStatus: 5
+      },
+      messageId: 1
+    }
+    validateStatusMessageRequest.mockReturnValueOnce(true)
+    getByClaimRefAndMessageType.mockResolvedValueOnce(null)
+    getLatestContactDetails.mockResolvedValueOnce({
+      name: 'Willow Farm',
+      email: 'john.doe@gmail.com'
+    })
+    config.carbonCopyEmailAddress = undefined
+
+    await processMessage(mockedLogger, event, mockMessageReceiver)
+
+    expect(validateStatusMessageRequest).toHaveBeenCalledTimes(1)
+    expect(mockCompleteMessage).toHaveBeenCalledTimes(1)
+    expect(mockedLogger.info).toHaveBeenCalledTimes(1)
+    expect(getByClaimRefAndMessageType).toHaveBeenCalledWith('TEMP-O9UD-22F6', 'statusChange-5')
+    expect(getLatestContactDetails).toHaveBeenCalledWith('AHWR-0AD3-3322', mockedLogger)
+    expect(sendEvidenceEmail).toHaveBeenCalledTimes(1)
+    expect(sendEvidenceEmail).toHaveBeenCalledWith({
+      addressType: 'email',
+      emailAddress: 'john.doe@gmail.com',
+      agreementReference: 'AHWR-0AD3-3322',
+      claimReference: 'TEMP-O9UD-22F6',
+      crn: '1100014934',
+      sbi: '106705779',
+      logger: mockedLogger
+    })
+    expect(set).toHaveBeenCalledWith({
+      agreementReference: 'AHWR-0AD3-3322',
+      claimReference: 'TEMP-O9UD-22F6',
+      messageType: 'statusChange-5',
+      data: {
+        name: 'Willow Farm',
         email: 'john.doe@gmail.com'
       }
     })
