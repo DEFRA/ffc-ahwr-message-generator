@@ -3,19 +3,20 @@ import util from 'util'
 
 const nineDigitId = joi.string().pattern(/^\d{9}$/)
 const tenDigitId = joi.string().pattern(/^\d{10}$/)
-const MAX_LENGTH = 320
-const MIN_LENGTH = 1
+const EMAIL_MIN_LENGTH = 1
+const EMAIL_MAX_LENGTH = 320
 const email = joi
   .string()
   .pattern(/^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/)
-  .min(MIN_LENGTH)
-  .max(MAX_LENGTH)
+  .min(EMAIL_MIN_LENGTH)
+  .max(EMAIL_MAX_LENGTH)
 
+const CLAIM_REFERENCE_LENGTH = 14
 const submitSFDSchema = joi.object({
   crn: tenDigitId,
   sbi: nineDigitId.required(),
   agreementReference: joi.string().required(),
-  claimReference: joi.string().max(14),
+  claimReference: joi.string().max(CLAIM_REFERENCE_LENGTH),
   templateId: joi.string().guid({ version: 'uuidv4' }).required(),
   emailAddress: email.required(),
   customParams: joi.object().required(),
