@@ -23,6 +23,7 @@ describe('sendEvidenceEmail', () => {
       claimReference: 'TEMP-O9UD-22F6',
       crn: '1100014934',
       sbi: '106705779',
+      addressType: 'email',
       logger: mockLogger
     }
 
@@ -44,13 +45,11 @@ describe('sendEvidenceEmail', () => {
     )
     expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith(
       {
-        name: 'email',
+        name: 'evidence-email-requested',
         properties: {
-          status: 'success',
-          agreementReference: 'AHWR-0AD3-3322',
+          status: true,
           claimReference: 'TEMP-O9UD-22F6',
-          emailAddress: 'test@example.com',
-          sbi: '106705779'
+          addressType: 'email'
         }
       })
   })

@@ -20,7 +20,8 @@ jest.mock('../../../../app/config/index.js', () => ({
 const mockedLogger = {
   info: jest.fn(),
   warn: jest.fn(),
-  debug: jest.fn()
+  debug: jest.fn(),
+  setBindings: jest.fn()
 }
 const mockCompleteMessage = jest.fn()
 const mockDeadLetterMessage = jest.fn()
