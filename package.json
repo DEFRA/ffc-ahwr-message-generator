@@ -1,6 +1,6 @@
 {
   "name": "ffc-ahwr-message-generator",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Service for creating messages to send to SFD",
   "homepage": "https://github.com/DEFRA/ffc-ahwr-message-generator",
   "main": "app/index.js",
@@ -29,7 +29,7 @@
     "joi": "17.13.3",
     "pg": "^8.13.1",
     "sequelize": "^6.37.5",
-    "ffc-ahwr-common-library": "^2.0.3"
+    "ffc-ahwr-common-library": "^2.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.26.8",

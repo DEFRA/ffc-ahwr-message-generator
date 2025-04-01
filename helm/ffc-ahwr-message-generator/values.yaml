@@ -41,6 +41,8 @@ container:
   messageGeneratorQueueAddress: ffc-ahwr-message-generator
   sfdMessageQueueAddress: ffc-ahwr-sfd-message
   evidenceEmailEnabled: false
+  evidenceReviewTemplateId: placeholder
+  evidenceReviewEmailReplyToId: placeholder
   applicationApiUri: https://ffc-ahwr-application.ffc-ahwr-snd2/api
 
 postgresService:

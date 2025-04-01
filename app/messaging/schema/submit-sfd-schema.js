@@ -17,17 +17,18 @@ const submitSFDSchema = joi.object({
   sbi: nineDigitId.required(),
   agreementReference: joi.string().required(),
   claimReference: joi.string().max(CLAIM_REFERENCE_LENGTH),
-  templateId: joi.string().guid({ version: 'uuidv4' }).required(),
+  notifyTemplateId: joi.string().guid({ version: 'uuidv4' }).required(),
+  emailReplyToId: joi.string().guid({ version: 'uuidv4' }).optional(),
   emailAddress: email.required(),
   customParams: joi.object().required(),
   dateTime: joi.date().required()
 })
 
-export const validateSFDSchema = (event) => {
+export const validateSFDSchema = (event, logger) => {
   const validate = submitSFDSchema.validate(event)
 
   if (validate.error) {
-    console.log('Submit SFD message validation error:', util.inspect(validate.error, false, null, true))
+    logger.warn('Submit SFD message validation error:', util.inspect(validate.error, false, null, true))
     return false
   }
   return true
