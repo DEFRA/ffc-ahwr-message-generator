@@ -27,7 +27,7 @@ export const sendEvidenceEmail = async (params) => {
   logger.info(`Sending ${addressType} evidence email`)
 
   try {
-    const { evidenceReviewTemplateId, evidenceFollowUpTemplateId, evidenceReviewEmailReplyToId } = config
+    const { evidenceReviewTemplateId, evidenceFollowUpTemplateId, emailReplyToId } = config
     const notifyTemplateId = claimType ? evidenceReviewTemplateId : evidenceFollowUpTemplateId
 
     const bulletPoints = BULLET_POINTS_BY_TYPE_OF_LIVESTOCK[typeOfLivestock] || []
@@ -42,7 +42,6 @@ export const sendEvidenceEmail = async (params) => {
       agreementReference,
       customSpeciesBullets: formattedBulletPoints
     }
-    const emailReplyToId = evidenceReviewEmailReplyToId
 
     await sendSFDEmail({
       crn, sbi, agreementReference, claimReference, notifyTemplateId, emailReplyToId, emailAddress, customParams, logger

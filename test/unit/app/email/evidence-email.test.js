@@ -13,7 +13,7 @@ jest.mock('../../../../app/config/index.js', () => ({
   config: {
     evidenceReviewTemplateId: '550e8400-e29b-41d4-a716-446655440000',
     evidenceFollowUpTemplateId: '111e8400-e29b-41d4-a716-446655440000',
-    evidenceReviewEmailReplyToId: 'email-reply-to-id'
+    emailReplyToId: 'email-reply-to-id'
   }
 }))
 
