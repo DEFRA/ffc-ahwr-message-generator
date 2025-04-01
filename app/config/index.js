@@ -10,7 +10,11 @@ export const getConfig = () => {
       enabled: joi.bool()
     },
     applicationApiUri: joi.string().uri(),
-    carbonCopyEmailAddress: joi.string().email().allow(null, '')
+    carbonCopyEmailAddress: joi.string().email().allow(null, ''),
+    evidenceReviewTemplateId: joi.string().uuid(),
+    evidenceReviewEmailReplyToId: joi.string().uuid(),
+    evidenceFollowUpTemplateId: joi.string().uuid(),
+    sfdRequestMsgType: joi.string()
   })
 
   const config = {
@@ -21,7 +25,11 @@ export const getConfig = () => {
       enabled: process.env.EVIDENCE_EMAIL_ENABLED === 'true'
     },
     applicationApiUri: process.env.APPLICATION_API_URI,
-    carbonCopyEmailAddress: process.env.CARBON_COPY_EMAIL_ADDRESS
+    carbonCopyEmailAddress: process.env.CARBON_COPY_EMAIL_ADDRESS,
+    evidenceReviewTemplateId: process.env.EVIDENCE_REVIEW_NOTIFY_TEMPLATE_ID,
+    evidenceReviewEmailReplyToId: process.env.EVIDENCE_REVIEW_EMAIL_REPLY_TO_ID,
+    evidenceFollowUpTemplateId: process.env.EVIDENCE_FOLLOW_UP_TEMPLATE_ID,
+    sfdRequestMsgType: 'uk.gov.ffc.ahwr.sfd.request'
   }
 
   const { error } = schema.validate(config, {

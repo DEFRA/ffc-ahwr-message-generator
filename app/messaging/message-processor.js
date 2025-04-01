@@ -16,19 +16,22 @@ const processInCheckStatusMessage = async (message, logger) => {
     logger.info('Skipping sending evidence email as feature flag is not enabled')
     return
   }
-  const { claimStatus, agreementReference, claimReference, sbi, crn } = message.body
+  const { claimStatus, agreementReference, claimReference, sbi, crn, claimType, typeOfLivestock } = message.body
   const messageType = `statusChange-${claimStatus}`
 
   const messageGenerate = await getByClaimRefAndMessageType(claimReference, messageType)
 
   if (!messageGenerate) {
     const contactDetails = await getLatestContactDetails(agreementReference, logger)
-    const { email, orgEmail } = contactDetails
+    const { name: orgName, orgEmail, email } = contactDetails
     const requestParams = {
       agreementReference,
       claimReference,
       crn,
       sbi,
+      orgName,
+      claimType,
+      typeOfLivestock,
       logger
     }
 
@@ -49,7 +52,13 @@ const processInCheckStatusMessage = async (message, logger) => {
       claimReference,
       messageType,
       data: {
-        ...contactDetails
+        crn,
+        sbi,
+        orgName,
+        claimType,
+        typeOfLivestock,
+        email,
+        orgEmail
       }
     })
   } else {
@@ -57,21 +66,26 @@ const processInCheckStatusMessage = async (message, logger) => {
   }
 }
 
-export async function processMessage (logger, message, messageReceiver) {
-  logger.info('Status update message received')
-  logger.debug(message.body)
+export async function processMessage(logger, message, messageReceiver) {
+  try {
+    logger.info('Status update message received')
+    logger.debug(message.body)
 
-  if (validateStatusMessageRequest(logger, message.body)) {
-    const { claimReference, claimStatus } = message.body
-    logger.setBindings({ claimReference, claimStatus })
+    if (validateStatusMessageRequest(logger, message.body)) {
+      const { claimReference, claimStatus } = message.body
+      logger.setBindings({ claimReference, claimStatus })
 
-    if (message.body.claimStatus === CLAIM_STATUS.IN_CHECK) {
-      await processInCheckStatusMessage(message, logger)
+      if (message.body.claimStatus === CLAIM_STATUS.IN_CHECK) {
+        await processInCheckStatusMessage(message, logger)
+      }
+
+      await messageReceiver.completeMessage(message)
+    } else {
+      logger.warn('Unsupported message received')
+      await messageReceiver.deadLetterMessage(message)
     }
-
-    await messageReceiver.completeMessage(message)
-  } else {
-    logger.warn('Unsupported message received')
+  } catch (err) {
     await messageReceiver.deadLetterMessage(message)
+    logger.error(`Unable to complete message generation request: ${err}`)
   }
 }

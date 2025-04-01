@@ -22,7 +22,8 @@ const mockedLogger = {
   info: jest.fn(),
   warn: jest.fn(),
   debug: jest.fn(),
-  setBindings: jest.fn()
+  setBindings: jest.fn(),
+  error: jest.fn()
 }
 const mockCompleteMessage = jest.fn()
 const mockDeadLetterMessage = jest.fn()
@@ -45,7 +46,9 @@ describe('process Message', () => {
         sbi: '106705779',
         agreementReference: 'AHWR-0AD3-3322',
         claimReference: 'TEMP-O9UD-22F6',
-        claimStatus: 5
+        claimStatus: 5,
+        claimType: 'R',
+        typeOfLivestock: 'beef'
       },
       messageId: 1
     }
@@ -72,7 +75,10 @@ describe('process Message', () => {
       claimReference: 'TEMP-O9UD-22F6',
       crn: '1100014934',
       sbi: '106705779',
-      logger: mockedLogger
+      claimType: 'R',
+      typeOfLivestock: 'beef',
+      logger: mockedLogger,
+      orgName: 'Willow Farm'
     })
     expect(sendEvidenceEmail).toHaveBeenCalledWith({
       addressType: 'orgEmail',
@@ -81,7 +87,10 @@ describe('process Message', () => {
       claimReference: 'TEMP-O9UD-22F6',
       crn: '1100014934',
       sbi: '106705779',
-      logger: mockedLogger
+      claimType: 'R',
+      typeOfLivestock: 'beef',
+      logger: mockedLogger,
+      orgName: 'Willow Farm'
     })
     expect(sendEvidenceEmail).toHaveBeenCalledWith({
       addressType: 'email',
@@ -90,7 +99,10 @@ describe('process Message', () => {
       claimReference: 'TEMP-O9UD-22F6',
       crn: '1100014934',
       sbi: '106705779',
-      logger: mockedLogger
+      claimType: 'R',
+      typeOfLivestock: 'beef',
+      logger: mockedLogger,
+      orgName: 'Willow Farm'
     })
 
     expect(set).toHaveBeenCalledWith({
@@ -98,10 +110,13 @@ describe('process Message', () => {
       claimReference: 'TEMP-O9UD-22F6',
       messageType: 'statusChange-5',
       data: {
-        name: 'Willow Farm',
+        orgName: 'Willow Farm',
         orgEmail: 'willowfarm@gmail.com',
-        farmerName: 'John Jim Doe',
-        email: 'john.doe@gmail.com'
+        email: 'john.doe@gmail.com',
+        crn: '1100014934',
+        sbi: '106705779',
+        claimType: 'R',
+        typeOfLivestock: 'beef'
       }
     })
   })
@@ -113,14 +128,16 @@ describe('process Message', () => {
         sbi: '106705779',
         agreementReference: 'AHWR-0AD3-3322',
         claimReference: 'TEMP-O9UD-22F6',
-        claimStatus: 5
+        claimStatus: 5,
+        claimType: 'R',
+        typeOfLivestock: 'sheep'
       },
       messageId: 1
     }
     validateStatusMessageRequest.mockReturnValueOnce(true)
     getByClaimRefAndMessageType.mockResolvedValueOnce(null)
     getLatestContactDetails.mockResolvedValueOnce({
-      name: 'Willow Farm',
+      farmerName: 'John Jim Doe',
       email: 'john.doe@gmail.com'
     })
     config.carbonCopyEmailAddress = undefined
@@ -140,6 +157,8 @@ describe('process Message', () => {
       claimReference: 'TEMP-O9UD-22F6',
       crn: '1100014934',
       sbi: '106705779',
+      claimType: 'R',
+      typeOfLivestock: 'sheep',
       logger: mockedLogger
     })
     expect(set).toHaveBeenCalledWith({
@@ -147,8 +166,11 @@ describe('process Message', () => {
       claimReference: 'TEMP-O9UD-22F6',
       messageType: 'statusChange-5',
       data: {
-        name: 'Willow Farm',
-        email: 'john.doe@gmail.com'
+        email: 'john.doe@gmail.com',
+        crn: '1100014934',
+        sbi: '106705779',
+        claimType: 'R',
+        typeOfLivestock: 'sheep'
       }
     })
   })
@@ -195,7 +217,9 @@ describe('process Message', () => {
         sbi: '106705779',
         agreementReference: 'AHWR-0AD3-3322',
         claimReference: 'TEMP-O9UD-22F6',
-        claimStatus: 5
+        claimStatus: 5,
+        claimType: 'R',
+        typeOfLivestock: 'dairy'
       },
       messageId: 1
     }
@@ -220,7 +244,9 @@ describe('process Message', () => {
         sbi: '106705779',
         agreementReference: 'AHWR-0AD3-3322',
         claimReference: 'TEMP-O9UD-22F6',
-        claimStatus: 7
+        claimStatus: 7,
+        claimType: 'R',
+        typeOfLivestock: 'sheep'
       },
       messageId: 1
     }
@@ -251,5 +277,36 @@ describe('process Message', () => {
     expect(validateStatusMessageRequest).toHaveBeenCalledTimes(1)
     expect(mockDeadLetterMessage).toHaveBeenCalledTimes(1)
     expect(mockedLogger.warn).toHaveBeenCalledTimes(1)
+  })
+
+  test('should mark as deadLettered when error occurs sending evidence email', async () => {
+    validateStatusMessageRequest.mockReturnValueOnce(true)
+    sendEvidenceEmail.mockRejectedValueOnce(new Error('SFD validation error'))
+    getByClaimRefAndMessageType.mockResolvedValueOnce(null)
+    getLatestContactDetails.mockResolvedValueOnce({
+      name: 'Willow Farm',
+      orgEmail: 'willowfarm@gmail.com',
+      farmerName: 'John Jim Doe',
+      email: 'john.doe@gmail.com'
+    })
+
+    const event = {
+      body: {
+        crn: '1100014934',
+        sbi: '106705779',
+        agreementReference: 'AHWR-0AD3-3322',
+        claimReference: 'TEMP-O9UD-22F6',
+        claimStatus: 5,
+        claimType: 'R',
+        typeOfLivestock: 'beef'
+      },
+      messageId: 1
+    }
+
+    await processMessage(mockedLogger, event, mockMessageReceiver)
+
+    expect(sendEvidenceEmail).toHaveBeenCalledTimes(1)
+    expect(mockDeadLetterMessage).toHaveBeenCalledWith(event)
+    expect(mockedLogger.error).toHaveBeenCalledWith("Unable to complete message generation request: Error: SFD validation error")
   })
 })
