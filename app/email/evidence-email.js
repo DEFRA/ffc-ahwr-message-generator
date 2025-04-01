@@ -27,7 +27,7 @@ export const sendEvidenceEmail = async (params) => {
   logger.info(`Sending ${addressType} evidence email`)
 
   try {
-    const { evidenceReviewTemplateId, evidenceFollowUpTemplateId = 'TODO', evidenceReviewEmailReplyToId } = config
+    const { evidenceReviewTemplateId, evidenceFollowUpTemplateId, evidenceReviewEmailReplyToId } = config
     const notifyTemplateId = claimType ? evidenceReviewTemplateId : evidenceFollowUpTemplateId
 
     const bulletPoints = BULLET_POINTS_BY_TYPE_OF_LIVESTOCK[typeOfLivestock] || []
