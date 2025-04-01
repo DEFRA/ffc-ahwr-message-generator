@@ -307,6 +307,6 @@ describe('process Message', () => {
 
     expect(sendEvidenceEmail).toHaveBeenCalledTimes(1)
     expect(mockDeadLetterMessage).toHaveBeenCalledWith(event)
-    expect(mockedLogger.error).toHaveBeenCalledWith("Unable to complete message generation request: Error: SFD validation error")
+    expect(mockedLogger.error).toHaveBeenCalledWith('Unable to complete message generation request: Error: SFD validation error')
   })
 })

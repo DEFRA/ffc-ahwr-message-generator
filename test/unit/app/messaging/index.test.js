@@ -2,6 +2,12 @@ import { MessageReceiver } from 'ffc-messaging'
 import { startMessageReceiver, stopMessageReceiver } from '../../../../app/messaging/index.js'
 
 jest.mock('ffc-messaging')
+jest.mock('../../../../app/config/message-queue.js', () => ({
+  messageQueueConfig: {
+    messageGeneratorQueue: 'ffc-ahwr-message-generator'
+  }
+}))
+jest.mock('../../../../app/config/index.js')
 
 const mockedLogger = {
   info: jest.fn(),

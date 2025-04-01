@@ -9,6 +9,13 @@ jest.mock('applicationinsights', () => ({
   }
 }))
 jest.mock('../../../../app/lib/sfd-client')
+jest.mock('../../../../app/config/index.js', () => ({
+  config: {
+    evidenceReviewTemplateId: '550e8400-e29b-41d4-a716-446655440000',
+    evidenceFollowUpTemplateId: '111e8400-e29b-41d4-a716-446655440000',
+    evidenceReviewEmailReplyToId: 'email-reply-to-id'
+  }
+}))
 
 const mockLogger = {
   info: jest.fn(),
@@ -26,6 +33,7 @@ describe('sendEvidenceEmail', () => {
       addressType: 'email',
       orgName: 'Willow Farm',
       typeOfLivestock: 'beef',
+      claimType: 'R',
       logger: mockLogger
     }
 
@@ -36,9 +44,10 @@ describe('sendEvidenceEmail', () => {
         crn: '1100014934',
         sbi: '106705779',
         emailAddress: 'test@example.com',
+        emailReplyToId: 'email-reply-to-id',
         agreementReference: 'AHWR-0AD3-3322',
         claimReference: 'TEMP-O9UD-22F6',
-        templateId: '550e8400-e29b-41d4-a716-446655440000',
+        notifyTemplateId: '550e8400-e29b-41d4-a716-446655440000',
         customParams: {
           sbi: '106705779',
           orgName: 'Willow Farm',
@@ -55,7 +64,8 @@ describe('sendEvidenceEmail', () => {
         properties: {
           status: true,
           claimReference: 'TEMP-O9UD-22F6',
-          addressType: 'email'
+          addressType: 'email',
+          templateId: '550e8400-e29b-41d4-a716-446655440000'
         }
       })
   })

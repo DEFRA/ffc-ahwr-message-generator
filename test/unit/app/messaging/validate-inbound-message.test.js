@@ -11,6 +11,8 @@ const validInputMessage = {
   agreementReference: 'IAHW-ABCD-3FGH',
   claimReference: 'FUDC-N87C-PIN5',
   claimStatus: 2,
+  claimType: 'R',
+  typeOfLivestock: 'beef',
   dateTime: new Date()
 }
 
