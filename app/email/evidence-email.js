@@ -17,13 +17,13 @@ const REVIEW_BULLET_POINTS_BY_TYPE_OF_LIVESTOCK = {
 
 const getFollowUpBulletPoints = (typeOfLivestock, testResults, piHuntRecommended) => {
   if ([BEEF, DAIRY].includes(typeOfLivestock)) {
-    if (testResults === 'positive') return FOLLOW_UP_CATTLE_POSITIVE
-    if (piHuntRecommended === 'yes') return FOLLOW_UP_CATTLE_NEGATIVE_RECOMMENDED_PI_HUNT
+    if (testResults === 'positive') { return FOLLOW_UP_CATTLE_POSITIVE }
+    if (piHuntRecommended === 'yes') { return FOLLOW_UP_CATTLE_NEGATIVE_RECOMMENDED_PI_HUNT }
     return FOLLOW_UP_CATTLE_NEGATIVE
   }
 
-  if (typeOfLivestock === PIGS) return FOLLOW_UP_PIGS
-  if (typeOfLivestock === SHEEP) return FOLLOW_UP_SHEEP
+  if (typeOfLivestock === PIGS) { return FOLLOW_UP_PIGS }
+  if (typeOfLivestock === SHEEP) { return FOLLOW_UP_SHEEP }
 
   return []
 }
