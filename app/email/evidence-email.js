@@ -39,19 +39,24 @@ export const sendEvidenceEmail = async (params) => {
 
   try {
     const { evidenceReviewTemplateId, evidenceFollowUpTemplateId, emailReplyToId } = config
-    const notifyTemplateId = claimType === 'R' ? evidenceReviewTemplateId : evidenceFollowUpTemplateId
 
-    const bulletPoints = claimType === 'R'
-      ? REVIEW_BULLET_POINTS_BY_TYPE_OF_LIVESTOCK[typeOfLivestock] || []
-      : getFollowUpBulletPoints(typeOfLivestock, testResults, piHuntRecommended)
-    const formattedBulletPoints = formatBullets(bulletPoints)
+    let notifyTemplateId
+    let bulletPoints
+
+    if (claimType === 'R') {
+      notifyTemplateId = evidenceReviewTemplateId
+      bulletPoints = REVIEW_BULLET_POINTS_BY_TYPE_OF_LIVESTOCK[typeOfLivestock] || []
+    } else {
+      notifyTemplateId = evidenceFollowUpTemplateId
+      bulletPoints = getFollowUpBulletPoints(typeOfLivestock, testResults, piHuntRecommended)
+    }
 
     const customParams = {
       sbi,
       orgName,
       claimReference,
       agreementReference,
-      customSpeciesBullets: formattedBulletPoints
+      customSpeciesBullets: formatBullets(bulletPoints)
     }
 
     await sendSFDEmail({
