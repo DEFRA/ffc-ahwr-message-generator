@@ -1,6 +1,15 @@
 import appInsights from 'applicationinsights'
-import { sendEvidenceEmail } from '../../../../app/email/evidence-email'
+import { formatBullets, sendEvidenceEmail } from '../../../../app/email/evidence-email'
 import { sendSFDEmail } from '../../../../app/lib/sfd-client'
+import { TYPE_OF_LIVESTOCK } from 'ffc-ahwr-common-library'
+import {
+  REVIEW_CATTLE, FOLLOW_UP_CATTLE_POSITIVE, FOLLOW_UP_CATTLE_NEGATIVE_RECOMMENDED_PI_HUNT, FOLLOW_UP_CATTLE_NEGATIVE, FOLLOW_UP_PIGS, FOLLOW_UP_SHEEP,
+  REVIEW_PIGS,
+  REVIEW_SHEEP
+} from './../../../../app/email/bullet-points'
+import { config as mockConfig } from '../../../../app/config/index.js' // Import the mocked config directly
+
+const { BEEF, DAIRY, PIGS, SHEEP } = TYPE_OF_LIVESTOCK
 
 jest.mock('applicationinsights', () => ({
   defaultClient: {
@@ -22,52 +31,215 @@ const mockLogger = {
   error: jest.fn()
 }
 
+const baseParams = {
+  emailAddress: 'test@example.com',
+  agreementReference: 'AHWR-0AD3-3322',
+  claimReference: 'TEMP-O9UD-22F6',
+  crn: '1100014934',
+  sbi: '106705779',
+  addressType: 'email',
+  orgName: 'Willow Farm',
+  logger: mockLogger
+}
+
 describe('sendEvidenceEmail', () => {
-  test('should send email and track appInsights success event', async () => {
-    const params = {
-      emailAddress: 'test@example.com',
-      agreementReference: 'AHWR-0AD3-3322',
-      claimReference: 'TEMP-O9UD-22F6',
-      crn: '1100014934',
-      sbi: '106705779',
-      addressType: 'email',
-      orgName: 'Willow Farm',
-      typeOfLivestock: 'beef',
-      claimType: 'R',
-      logger: mockLogger
-    }
+  describe('Review Emails', () => {
+    test.each([
+      { livestock: BEEF, expectedBullets: formatBullets(REVIEW_CATTLE) },
+      { livestock: DAIRY, expectedBullets: formatBullets(REVIEW_CATTLE) },
+      { livestock: PIGS, expectedBullets: formatBullets(REVIEW_PIGS) },
+      { livestock: SHEEP, expectedBullets: formatBullets(REVIEW_SHEEP) },
+      { livestock: 'Goats', expectedBullets: '' } // unknown livestock
+    ])('should send correct review email for $livestock', async ({ livestock, expectedBullets }) => {
+      const params = {
+        ...baseParams,
+        claimType: 'R',
+        typeOfLivestock: livestock
+      }
 
-    await sendEvidenceEmail(params)
+      await sendEvidenceEmail(params)
 
-    expect(sendSFDEmail).toHaveBeenCalledWith(
-      {
-        crn: '1100014934',
-        sbi: '106705779',
-        emailAddress: 'test@example.com',
-        emailReplyToId: 'email-reply-to-id',
-        agreementReference: 'AHWR-0AD3-3322',
-        claimReference: 'TEMP-O9UD-22F6',
-        notifyTemplateId: '550e8400-e29b-41d4-a716-446655440000',
+      expect(sendSFDEmail).toHaveBeenCalledTimes(1)
+      expect(sendSFDEmail).toHaveBeenCalledWith({
+        crn: params.crn,
+        sbi: params.sbi,
+        emailAddress: params.emailAddress,
+        emailReplyToId: mockConfig.emailReplyToId,
+        agreementReference: params.agreementReference,
+        claimReference: params.claimReference,
+        notifyTemplateId: mockConfig.evidenceReviewTemplateId,
         customParams: {
-          sbi: '106705779',
-          orgName: 'Willow Farm',
-          claimReference: 'TEMP-O9UD-22F6',
-          agreementReference: 'AHWR-0AD3-3322',
-          customSpeciesBullets: '* the test results (positive or negative)\n* if a blood (serum) antibody test was done, the summary must also include the number of animals samples were taken from'
+          sbi: params.sbi,
+          orgName: params.orgName,
+          claimReference: params.claimReference,
+          agreementReference: params.agreementReference,
+          customSpeciesBullets: expectedBullets
         },
         logger: mockLogger
-      }
-    )
-    expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith(
-      {
+      })
+
+      expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledTimes(1)
+      expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith({
         name: 'evidence-email-requested',
         properties: {
           status: true,
-          claimReference: 'TEMP-O9UD-22F6',
-          addressType: 'email',
-          templateId: '550e8400-e29b-41d4-a716-446655440000'
+          claimReference: params.claimReference,
+          addressType: params.addressType,
+          templateId: mockConfig.evidenceReviewTemplateId
         }
       })
+
+      expect(mockLogger.info).toHaveBeenCalledWith(`Sending ${params.addressType} evidence email`)
+      expect(mockLogger.info).toHaveBeenCalledWith(`Sent ${params.addressType} evidence email`)
+      expect(mockLogger.error).not.toHaveBeenCalled()
+      expect(appInsights.defaultClient.trackException).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Follow-up Emails', () => {
+    test('should send correct follow-up email for CATTLE (Positive)', async () => {
+      const params = {
+        ...baseParams,
+        claimType: 'E',
+        typeOfLivestock: BEEF,
+        testResults: 'positive',
+        piHuntRecommended: 'no'
+      }
+
+      await sendEvidenceEmail(params)
+
+      expect(sendSFDEmail).toHaveBeenCalledTimes(1)
+      expect(sendSFDEmail).toHaveBeenCalledWith(expect.objectContaining({
+        notifyTemplateId: mockConfig.evidenceFollowUpTemplateId,
+        customParams: expect.objectContaining({
+          customSpeciesBullets: formatBullets(FOLLOW_UP_CATTLE_POSITIVE)
+        })
+      }))
+      expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith(expect.objectContaining({
+        properties: expect.objectContaining({ templateId: mockConfig.evidenceFollowUpTemplateId })
+      }))
+      expect(mockLogger.info).toHaveBeenCalledTimes(2)
+      expect(mockLogger.error).not.toHaveBeenCalled()
+    })
+
+    test('should send correct follow-up email for CATTLE (Negative, No PI Hunt Recommended)', async () => {
+      const params = {
+        ...baseParams,
+        claimType: 'E',
+        typeOfLivestock: DAIRY,
+        testResults: 'negative',
+        piHuntRecommended: 'no'
+      }
+
+      await sendEvidenceEmail(params)
+
+      expect(sendSFDEmail).toHaveBeenCalledTimes(1)
+      expect(sendSFDEmail).toHaveBeenCalledWith(expect.objectContaining({
+        notifyTemplateId: mockConfig.evidenceFollowUpTemplateId,
+        customParams: expect.objectContaining({
+          customSpeciesBullets: formatBullets(FOLLOW_UP_CATTLE_NEGATIVE)
+        })
+      }))
+      expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith(expect.objectContaining({
+        properties: expect.objectContaining({ templateId: mockConfig.evidenceFollowUpTemplateId })
+      }))
+      expect(mockLogger.info).toHaveBeenCalledTimes(2)
+      expect(mockLogger.error).not.toHaveBeenCalled()
+    })
+
+    test('should send correct follow-up email for CATTLE (Negative, PI Hunt Recommended)', async () => {
+      const params = {
+        ...baseParams,
+        claimType: 'E',
+        typeOfLivestock: BEEF,
+        testResults: 'negative',
+        piHuntRecommended: 'yes'
+      }
+
+      await sendEvidenceEmail(params)
+
+      expect(sendSFDEmail).toHaveBeenCalledTimes(1)
+      expect(sendSFDEmail).toHaveBeenCalledWith(expect.objectContaining({
+        notifyTemplateId: mockConfig.evidenceFollowUpTemplateId,
+        customParams: expect.objectContaining({
+          customSpeciesBullets: formatBullets(FOLLOW_UP_CATTLE_NEGATIVE_RECOMMENDED_PI_HUNT)
+        })
+      }))
+      expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith(expect.objectContaining({
+        properties: expect.objectContaining({ templateId: mockConfig.evidenceFollowUpTemplateId })
+      }))
+      expect(mockLogger.info).toHaveBeenCalledTimes(2)
+      expect(mockLogger.error).not.toHaveBeenCalled()
+    })
+
+    test('should send correct follow-up email for PIGS', async () => {
+      const params = {
+        ...baseParams,
+        claimType: 'E',
+        typeOfLivestock: PIGS
+      }
+
+      await sendEvidenceEmail(params)
+
+      expect(sendSFDEmail).toHaveBeenCalledTimes(1)
+      expect(sendSFDEmail).toHaveBeenCalledWith(expect.objectContaining({
+        notifyTemplateId: mockConfig.evidenceFollowUpTemplateId,
+        customParams: expect.objectContaining({
+          customSpeciesBullets: formatBullets(FOLLOW_UP_PIGS)
+        })
+      }))
+      expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith(expect.objectContaining({
+        properties: expect.objectContaining({ templateId: mockConfig.evidenceFollowUpTemplateId })
+      }))
+      expect(mockLogger.info).toHaveBeenCalledTimes(2)
+      expect(mockLogger.error).not.toHaveBeenCalled()
+    })
+
+    test('should send correct follow-up email for SHEEP', async () => {
+      const params = {
+        ...baseParams,
+        claimType: 'E',
+        typeOfLivestock: SHEEP
+      }
+
+      await sendEvidenceEmail(params)
+
+      expect(sendSFDEmail).toHaveBeenCalledTimes(1)
+      expect(sendSFDEmail).toHaveBeenCalledWith(expect.objectContaining({
+        notifyTemplateId: mockConfig.evidenceFollowUpTemplateId,
+        customParams: expect.objectContaining({
+          customSpeciesBullets: formatBullets(FOLLOW_UP_SHEEP)
+        })
+      }))
+      expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith(expect.objectContaining({
+        properties: expect.objectContaining({ templateId: mockConfig.evidenceFollowUpTemplateId })
+      }))
+      expect(mockLogger.info).toHaveBeenCalledTimes(2)
+      expect(mockLogger.error).not.toHaveBeenCalled()
+    })
+
+    test('should send follow-up email with empty bullets for unknown livestock', async () => {
+      const params = {
+        ...baseParams,
+        claimType: 'E',
+        typeOfLivestock: 'Goat' // Unknown type
+      }
+
+      await sendEvidenceEmail(params)
+
+      expect(sendSFDEmail).toHaveBeenCalledTimes(1)
+      expect(sendSFDEmail).toHaveBeenCalledWith(expect.objectContaining({
+        notifyTemplateId: mockConfig.evidenceFollowUpTemplateId,
+        customParams: expect.objectContaining({
+          customSpeciesBullets: ''
+        })
+      }))
+      expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith(expect.objectContaining({
+        properties: expect.objectContaining({ templateId: mockConfig.evidenceFollowUpTemplateId })
+      }))
+      expect(mockLogger.info).toHaveBeenCalledTimes(2)
+      expect(mockLogger.error).not.toHaveBeenCalled()
+    })
   })
 
   test('should track an appInisghts exception when email fails to send', async () => {

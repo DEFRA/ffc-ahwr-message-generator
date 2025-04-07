@@ -48,7 +48,9 @@ describe('process Message', () => {
         claimReference: 'TEMP-O9UD-22F6',
         claimStatus: 5,
         claimType: 'R',
-        typeOfLivestock: 'beef'
+        typeOfLivestock: 'beef',
+        testResults: 'positive',
+        piHuntRecommended: 'yes'
       },
       messageId: 1
     }
@@ -78,7 +80,9 @@ describe('process Message', () => {
       claimType: 'R',
       typeOfLivestock: 'beef',
       logger: mockedLogger,
-      orgName: 'Willow Farm'
+      orgName: 'Willow Farm',
+      testResults: 'positive',
+      piHuntRecommended: 'yes'
     })
     expect(sendEvidenceEmail).toHaveBeenCalledWith({
       addressType: 'orgEmail',
@@ -90,7 +94,9 @@ describe('process Message', () => {
       claimType: 'R',
       typeOfLivestock: 'beef',
       logger: mockedLogger,
-      orgName: 'Willow Farm'
+      orgName: 'Willow Farm',
+      testResults: 'positive',
+      piHuntRecommended: 'yes'
     })
     expect(sendEvidenceEmail).toHaveBeenCalledWith({
       addressType: 'email',
@@ -102,7 +108,9 @@ describe('process Message', () => {
       claimType: 'R',
       typeOfLivestock: 'beef',
       logger: mockedLogger,
-      orgName: 'Willow Farm'
+      orgName: 'Willow Farm',
+      testResults: 'positive',
+      piHuntRecommended: 'yes'
     })
 
     expect(set).toHaveBeenCalledWith({
@@ -116,7 +124,9 @@ describe('process Message', () => {
         crn: '1100014934',
         sbi: '106705779',
         claimType: 'R',
-        typeOfLivestock: 'beef'
+        typeOfLivestock: 'beef',
+        testResults: 'positive',
+        piHuntRecommended: 'yes'
       }
     })
   })

@@ -2,45 +2,61 @@ import appInsights from 'applicationinsights'
 import { sendSFDEmail } from '../lib/sfd-client.js'
 import { config } from '../config/index.js'
 import { TYPE_OF_LIVESTOCK } from 'ffc-ahwr-common-library'
+import {
+  REVIEW_CATTLE, FOLLOW_UP_CATTLE_POSITIVE, FOLLOW_UP_CATTLE_NEGATIVE_RECOMMENDED_PI_HUNT, FOLLOW_UP_CATTLE_NEGATIVE, FOLLOW_UP_PIGS, FOLLOW_UP_SHEEP, REVIEW_PIGS, REVIEW_SHEEP
+} from './bullet-points.js'
 
 const { BEEF, DAIRY, PIGS, SHEEP } = TYPE_OF_LIVESTOCK
-const CATTLE_BULLET_POINTS = [
-  'the test results (positive or negative)',
-  'if a blood (serum) antibody test was done, the summary must also include the number of animals samples were taken from'
-]
-const BULLET_POINTS_BY_TYPE_OF_LIVESTOCK = {
-  [BEEF]: CATTLE_BULLET_POINTS,
-  [DAIRY]: CATTLE_BULLET_POINTS,
-  [PIGS]: [
-    'the number of oral fluid samples that were tested and the test results (positive or negative)',
-    'the number of animals that samples were taken from'
-  ],
-  [SHEEP]: [
-    'the number of lambs or animals under 12 months that samples were taken from the test results'
-  ]
+
+const REVIEW_BULLET_POINTS_BY_TYPE_OF_LIVESTOCK = {
+  [BEEF]: REVIEW_CATTLE,
+  [DAIRY]: REVIEW_CATTLE,
+  [PIGS]: REVIEW_PIGS,
+  [SHEEP]: REVIEW_SHEEP
 }
+
+const getFollowUpBulletPoints = (typeOfLivestock, testResults, piHuntRecommended) => {
+  if ([BEEF, DAIRY].includes(typeOfLivestock)) {
+    if (testResults === 'positive') { return FOLLOW_UP_CATTLE_POSITIVE }
+    if (piHuntRecommended === 'yes') { return FOLLOW_UP_CATTLE_NEGATIVE_RECOMMENDED_PI_HUNT }
+    return FOLLOW_UP_CATTLE_NEGATIVE
+  }
+
+  if (typeOfLivestock === PIGS) { return FOLLOW_UP_PIGS }
+  if (typeOfLivestock === SHEEP) { return FOLLOW_UP_SHEEP }
+
+  return []
+}
+
+export const formatBullets = (bullets = []) => bullets.map((bullet) => `* ${bullet}`)
+  .join('\n')
 
 export const sendEvidenceEmail = async (params) => {
   const {
-    emailAddress, agreementReference, claimReference, sbi, crn, logger, addressType, orgName, claimType, typeOfLivestock
+    emailAddress, agreementReference, claimReference, sbi, crn, logger, addressType, orgName, claimType, typeOfLivestock, testResults, piHuntRecommended
   } = params
   logger.info(`Sending ${addressType} evidence email`)
 
   try {
     const { evidenceReviewTemplateId, evidenceFollowUpTemplateId, emailReplyToId } = config
-    const notifyTemplateId = claimType ? evidenceReviewTemplateId : evidenceFollowUpTemplateId
 
-    const bulletPoints = BULLET_POINTS_BY_TYPE_OF_LIVESTOCK[typeOfLivestock] || []
-    const formattedBulletPoints = bulletPoints
-      .map(value => `* ${value}`)
-      .join('\n')
+    let notifyTemplateId
+    let bulletPoints
+
+    if (claimType === 'R') {
+      notifyTemplateId = evidenceReviewTemplateId
+      bulletPoints = REVIEW_BULLET_POINTS_BY_TYPE_OF_LIVESTOCK[typeOfLivestock] || []
+    } else {
+      notifyTemplateId = evidenceFollowUpTemplateId
+      bulletPoints = getFollowUpBulletPoints(typeOfLivestock, testResults, piHuntRecommended)
+    }
 
     const customParams = {
       sbi,
       orgName,
       claimReference,
       agreementReference,
-      customSpeciesBullets: formattedBulletPoints
+      customSpeciesBullets: formatBullets(bulletPoints)
     }
 
     await sendSFDEmail({
