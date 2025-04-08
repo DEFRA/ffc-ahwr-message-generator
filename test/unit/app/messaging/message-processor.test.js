@@ -238,7 +238,7 @@ describe('process Message', () => {
 
     await processMessage(mockedLogger, event, mockMessageReceiver)
 
-    expect(validateStatusMessageRequest).toHaveBeenCalledTimes(1)
+    expect(validateStatusMessageRequest).toHaveBeenCalledTimes(0)
     expect(mockCompleteMessage).toHaveBeenCalledTimes(1)
     expect(mockedLogger.info).toHaveBeenCalledTimes(2)
     expect(getByClaimRefAndMessageType).toHaveBeenCalledTimes(0)
