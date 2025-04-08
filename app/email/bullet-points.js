@@ -12,32 +12,35 @@ export const REVIEW_SHEEP = [
   'the number of lambs or animals under 12 months that samples were taken from the test results'
 ]
 
+const REVIEW_TEST_RESULTS_WITHIN_10_MONTHS = 'the test results from the review carried out within the last 10 months'
+const CONFIRMATION_BIOSECURITY_ASSESSMENT = 'confirmation that the vet carried out biosecurity assessment'
+
 export const FOLLOW_UP_CATTLE_POSITIVE = [
-  'the test results from the review carried out within the last 10 months',
+  REVIEW_TEST_RESULTS_WITHIN_10_MONTHS,
   'the date the vet took the samples for testing of the cattle',
   'confirmation that a persistently infected (PI) hunt was carried out, for all cattle in the herd, by blood sampling for virus or BVD tissue (button tag) sampling, or a combination of both',
   'test results from the follow-up (positive or negative)',
   'the laboratory unique reference number (URN) or certificate number for the test results',
-  'confirmation that the vet carried out biosecurity assessment'
+  CONFIRMATION_BIOSECURITY_ASSESSMENT
 ]
 
 export const FOLLOW_UP_CATTLE_NEGATIVE = [
-  'the test results from the review carried out within the last 10 months',
-  'confirmation that the vet carried out biosecurity assessment'
+  REVIEW_TEST_RESULTS_WITHIN_10_MONTHS,
+  CONFIRMATION_BIOSECURITY_ASSESSMENT
 ]
 
 export const FOLLOW_UP_CATTLE_NEGATIVE_RECOMMENDED_PI_HUNT = [
-  'the test results from the review carried out within the last 10 months',
+  REVIEW_TEST_RESULTS_WITHIN_10_MONTHS,
   'the date the vet took the samples for testing of the cattle',
   'confirmation that a persistently infected (PI) hunt was carried out, for all cattle in the herd, by blood sampling for virus or BVD tissue (button tag) sampling, or a combination of both',
   'test results from the follow-up (positive or negative)',
   'the laboratory unique reference number (URN) or certificate number for the test results',
-  'confirmation that the vet carried out biosecurity assessment',
+  CONFIRMATION_BIOSECURITY_ASSESSMENT,
   'confirmation that the vet recommended the PI hunt'
 ]
 
 export const FOLLOW_UP_PIGS = [
-  'the test results from the review carried out within the last 10 months',
+  REVIEW_TEST_RESULTS_WITHIN_10_MONTHS,
   'the date the vet took the samples for testing of the pigs',
   'the number of animals samples were taken from the number of blood (serum) samples tested',
   'the disease status category',
