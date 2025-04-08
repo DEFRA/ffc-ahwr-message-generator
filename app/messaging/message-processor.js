@@ -16,7 +16,7 @@ const processInCheckStatusMessage = async (message, logger) => {
     logger.info('Skipping sending evidence email as feature flag is not enabled')
     return
   }
-  const { claimStatus, agreementReference, claimReference, sbi, crn, claimType, typeOfLivestock, testResults, piHuntRecommended } = message.body
+  const { claimStatus, agreementReference, claimReference, sbi, crn, claimType, typeOfLivestock, reviewTestResults, piHuntRecommended } = message.body
   const messageType = `statusChange-${claimStatus}`
   const messageGenerate = await getByClaimRefAndMessageType(claimReference, messageType)
 
@@ -31,7 +31,7 @@ const processInCheckStatusMessage = async (message, logger) => {
       orgName,
       claimType,
       typeOfLivestock,
-      testResults,
+      reviewTestResults,
       piHuntRecommended,
       logger
     }
@@ -60,7 +60,7 @@ const processInCheckStatusMessage = async (message, logger) => {
         typeOfLivestock,
         email,
         orgEmail,
-        testResults,
+        reviewTestResults,
         piHuntRecommended
       }
     })
