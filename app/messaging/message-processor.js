@@ -74,7 +74,6 @@ const processInCheckStatusMessage = async (message, logger) => {
 export async function processMessage (logger, message, messageReceiver) {
   try {
     logger.info('Status update message received')
-    console.log(message)
 
     if (validateStatusMessageRequest(logger, message.body)) {
       const { claimReference, claimStatus } = message.body
