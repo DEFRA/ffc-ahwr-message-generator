@@ -15,10 +15,10 @@ const REVIEW_BULLET_POINTS_BY_TYPE_OF_LIVESTOCK = {
   [SHEEP]: REVIEW_SHEEP
 }
 
-const getFollowUpBulletPoints = (typeOfLivestock, reviewTestResults, piHuntRecommended) => {
+const getFollowUpBulletPoints = (typeOfLivestock, reviewTestResults, piHuntRecommended, piHuntAllAnimals) => {
   if ([BEEF, DAIRY].includes(typeOfLivestock)) {
     if (reviewTestResults === 'positive') { return FOLLOW_UP_CATTLE_POSITIVE }
-    if (piHuntRecommended === 'yes') { return FOLLOW_UP_CATTLE_NEGATIVE_RECOMMENDED_PI_HUNT }
+    if (piHuntRecommended === 'yes' && piHuntAllAnimals === 'yes') { return FOLLOW_UP_CATTLE_NEGATIVE_RECOMMENDED_PI_HUNT }
     return FOLLOW_UP_CATTLE_NEGATIVE
   }
 
@@ -33,7 +33,7 @@ export const formatBullets = (bullets = []) => bullets.map((bullet) => `* ${bull
 
 export const sendEvidenceEmail = async (params) => {
   const {
-    emailAddress, agreementReference, claimReference, sbi, crn, logger, addressType, orgName, claimType, typeOfLivestock, reviewTestResults, piHuntRecommended
+    emailAddress, agreementReference, claimReference, sbi, crn, logger, addressType, orgName, claimType, typeOfLivestock, reviewTestResults, piHuntRecommended, piHuntAllAnimals
   } = params
   logger.info(`Sending ${addressType} evidence email`)
 
@@ -48,7 +48,7 @@ export const sendEvidenceEmail = async (params) => {
       bulletPoints = REVIEW_BULLET_POINTS_BY_TYPE_OF_LIVESTOCK[typeOfLivestock] || []
     } else {
       notifyTemplateId = evidenceFollowUpTemplateId
-      bulletPoints = getFollowUpBulletPoints(typeOfLivestock, reviewTestResults, piHuntRecommended)
+      bulletPoints = getFollowUpBulletPoints(typeOfLivestock, reviewTestResults, piHuntRecommended, piHuntAllAnimals)
     }
 
     const customParams = {

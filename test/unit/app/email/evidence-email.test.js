@@ -153,7 +153,8 @@ describe('sendEvidenceEmail', () => {
         claimType: 'E',
         typeOfLivestock: BEEF,
         reviewTestResults: 'negative',
-        piHuntRecommended: 'yes'
+        piHuntRecommended: 'yes',
+        piHuntAllAnimals: 'yes'
       }
 
       await sendEvidenceEmail(params)

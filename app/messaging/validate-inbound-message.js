@@ -19,7 +19,8 @@ const inboundStatusMessageSchema = joi.object({
   typeOfLivestock: joi.string().required(),
   dateTime: joi.date().iso().required(),
   reviewTestResults: joi.string().optional(),
-  piHuntRecommended: joi.string().optional()
+  piHuntRecommended: joi.string().optional(),
+  piHuntAllAnimals: joi.string().optional()
 })
 
 export const validateStatusMessageRequest = (logger, event) => {

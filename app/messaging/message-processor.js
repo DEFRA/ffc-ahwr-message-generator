@@ -16,7 +16,7 @@ const processInCheckStatusMessage = async (message, logger) => {
     logger.info('Skipping sending evidence email as feature flag is not enabled')
     return
   }
-  const { claimStatus, agreementReference, claimReference, sbi, crn, claimType, typeOfLivestock, reviewTestResults, piHuntRecommended } = message.body
+  const { claimStatus, agreementReference, claimReference, sbi, crn, claimType, typeOfLivestock, reviewTestResults, piHuntRecommended, piHuntAllAnimals } = message.body
   const messageType = `statusChange-${claimStatus}`
   const messageGenerate = await getByClaimRefAndMessageType(claimReference, messageType)
 
@@ -33,6 +33,7 @@ const processInCheckStatusMessage = async (message, logger) => {
       typeOfLivestock,
       reviewTestResults,
       piHuntRecommended,
+      piHuntAllAnimals,
       logger
     }
 
@@ -61,7 +62,8 @@ const processInCheckStatusMessage = async (message, logger) => {
         email,
         orgEmail,
         reviewTestResults,
-        piHuntRecommended
+        piHuntRecommended,
+        piHuntAllAnimals
       }
     })
   } else {
@@ -72,6 +74,7 @@ const processInCheckStatusMessage = async (message, logger) => {
 export async function processMessage (logger, message, messageReceiver) {
   try {
     logger.info('Status update message received')
+    console.log(message)
 
     if (validateStatusMessageRequest(logger, message.body)) {
       const { claimReference, claimStatus } = message.body
