@@ -102,7 +102,7 @@ describe('sendEvidenceEmail', () => {
         ...baseParams,
         claimType: 'E',
         typeOfLivestock: BEEF,
-        testResults: 'positive',
+        reviewTestResults: 'positive',
         piHuntRecommended: 'no'
       }
 
@@ -127,7 +127,7 @@ describe('sendEvidenceEmail', () => {
         ...baseParams,
         claimType: 'E',
         typeOfLivestock: DAIRY,
-        testResults: 'negative',
+        reviewTestResults: 'negative',
         piHuntRecommended: 'no'
       }
 
@@ -152,8 +152,9 @@ describe('sendEvidenceEmail', () => {
         ...baseParams,
         claimType: 'E',
         typeOfLivestock: BEEF,
-        testResults: 'negative',
-        piHuntRecommended: 'yes'
+        reviewTestResults: 'negative',
+        piHuntRecommended: 'yes',
+        piHuntAllAnimals: 'yes'
       }
 
       await sendEvidenceEmail(params)

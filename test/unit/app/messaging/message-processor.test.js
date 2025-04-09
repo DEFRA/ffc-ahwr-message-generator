@@ -49,8 +49,9 @@ describe('process Message', () => {
         claimStatus: 5,
         claimType: 'R',
         typeOfLivestock: 'beef',
-        testResults: 'positive',
-        piHuntRecommended: 'yes'
+        reviewTestResults: 'positive',
+        piHuntRecommended: 'yes',
+        piHuntAllAnimals: 'no'
       },
       messageId: 1
     }
@@ -81,8 +82,9 @@ describe('process Message', () => {
       typeOfLivestock: 'beef',
       logger: mockedLogger,
       orgName: 'Willow Farm',
-      testResults: 'positive',
-      piHuntRecommended: 'yes'
+      reviewTestResults: 'positive',
+      piHuntRecommended: 'yes',
+      piHuntAllAnimals: 'no'
     })
     expect(sendEvidenceEmail).toHaveBeenCalledWith({
       addressType: 'orgEmail',
@@ -95,8 +97,9 @@ describe('process Message', () => {
       typeOfLivestock: 'beef',
       logger: mockedLogger,
       orgName: 'Willow Farm',
-      testResults: 'positive',
-      piHuntRecommended: 'yes'
+      reviewTestResults: 'positive',
+      piHuntRecommended: 'yes',
+      piHuntAllAnimals: 'no'
     })
     expect(sendEvidenceEmail).toHaveBeenCalledWith({
       addressType: 'email',
@@ -109,8 +112,9 @@ describe('process Message', () => {
       typeOfLivestock: 'beef',
       logger: mockedLogger,
       orgName: 'Willow Farm',
-      testResults: 'positive',
-      piHuntRecommended: 'yes'
+      reviewTestResults: 'positive',
+      piHuntRecommended: 'yes',
+      piHuntAllAnimals: 'no'
     })
 
     expect(set).toHaveBeenCalledWith({
@@ -125,8 +129,9 @@ describe('process Message', () => {
         sbi: '106705779',
         claimType: 'R',
         typeOfLivestock: 'beef',
-        testResults: 'positive',
-        piHuntRecommended: 'yes'
+        reviewTestResults: 'positive',
+        piHuntRecommended: 'yes',
+        piHuntAllAnimals: 'no'
       }
     })
   })
