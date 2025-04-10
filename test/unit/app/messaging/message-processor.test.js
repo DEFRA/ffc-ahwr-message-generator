@@ -14,7 +14,7 @@ jest.mock('../../../../app/config/index.js', () => ({
     evidenceEmail: {
       enabled: true
     },
-    carbonCopyEmailAddress: 'cc-email@gmail.com'
+    evidenceCarbonCopyEmailAddress: 'cc-email@gmail.com'
   }
 }))
 
@@ -36,7 +36,7 @@ const mockMessageReceiver = {
 describe('process Message', () => {
   afterEach(() => {
     config.evidenceEmail.enabled = true
-    config.carbonCopyEmailAddress = 'cc-email@gmail.com'
+    config.evidenceCarbonCopyEmailAddress = 'cc-email@gmail.com'
   })
 
   test('should send an evidence email when it is the first time the claim has the status of in check', async () => {
@@ -155,7 +155,7 @@ describe('process Message', () => {
       farmerName: 'John Jim Doe',
       email: 'john.doe@gmail.com'
     })
-    config.carbonCopyEmailAddress = undefined
+    config.evidenceCarbonCopyEmailAddress = undefined
 
     await processMessage(mockedLogger, event, mockMessageReceiver)
 
