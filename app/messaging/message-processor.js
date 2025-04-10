@@ -37,8 +37,8 @@ const processInCheckStatusMessage = async (message, logger) => {
       logger
     }
 
-    if (config.carbonCopyEmailAddress) {
-      await sendEvidenceEmail({ ...requestParams, emailAddress: config.carbonCopyEmailAddress, addressType: AddressType.CC })
+    if (config.evidenceCarbonCopyEmailAddress) {
+      await sendEvidenceEmail({ ...requestParams, emailAddress: config.evidenceCarbonCopyEmailAddress, addressType: AddressType.CC })
     }
 
     if (orgEmail) {

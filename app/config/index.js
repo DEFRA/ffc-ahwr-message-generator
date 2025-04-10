@@ -10,7 +10,7 @@ export const getConfig = () => {
       enabled: joi.bool()
     },
     applicationApiUri: joi.string().uri(),
-    carbonCopyEmailAddress: joi.string().email().allow(null, ''),
+    evidenceCarbonCopyEmailAddress: joi.string().email().allow(null, ''),
     evidenceReviewTemplateId: joi.string().uuid(),
     emailReplyToId: joi.string().uuid(),
     evidenceFollowUpTemplateId: joi.string().uuid(),
@@ -25,7 +25,7 @@ export const getConfig = () => {
       enabled: process.env.EVIDENCE_EMAIL_ENABLED === 'true'
     },
     applicationApiUri: process.env.APPLICATION_API_URI,
-    carbonCopyEmailAddress: process.env.CARBON_COPY_EMAIL_ADDRESS,
+    evidenceCarbonCopyEmailAddress: process.env.EVIDENCE_CARBON_COPY_EMAIL_ADDRESS,
     evidenceReviewTemplateId: process.env.EVIDENCE_REVIEW_TEMPLATE_ID,
     emailReplyToId: process.env.EMAIL_REPLY_TO_ID,
     evidenceFollowUpTemplateId: process.env.EVIDENCE_FOLLOW_UP_TEMPLATE_ID,
