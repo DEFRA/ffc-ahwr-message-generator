@@ -28,8 +28,9 @@ const getFollowUpBulletPoints = (typeOfLivestock, reviewTestResults, piHuntRecom
   return []
 }
 
-export const formatBullets = (bullets = []) => bullets.map((bullet) => `* ${bullet}`)
-  .join('\n')
+export const formatBullets = (bullets = []) => bullets.length
+  ? bullets.map((bullet) => `* ${bullet}`).join('\n') + '\n'
+  : ''
 
 export const sendEvidenceEmail = async (params) => {
   const {
