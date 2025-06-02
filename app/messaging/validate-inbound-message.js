@@ -20,7 +20,8 @@ const inboundStatusMessageSchema = joi.object({
   dateTime: joi.date().iso().required(),
   reviewTestResults: joi.string().optional(),
   piHuntRecommended: joi.string().optional(),
-  piHuntAllAnimals: joi.string().optional()
+  piHuntAllAnimals: joi.string().optional(),
+  herdName: joi.string().required()
 })
 
 export const validateStatusMessageRequest = (logger, event) => {
