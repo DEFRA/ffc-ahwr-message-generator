@@ -1,3 +1,4 @@
+import { config } from '../../../../app/config/index.js'
 import { validateStatusMessageRequest } from '../../../../app/messaging/validate-inbound-message.js'
 
 const mockSetBindingsLogger = jest.fn()
@@ -17,8 +18,23 @@ const validInputMessage = {
 }
 
 describe('validateStatusMessageRequest', () => {
+  beforeEach(() => {
+    config.multiHerds.enabled = false
+  })
+
   test('returns true if the validation is successful', () => {
+    config.multiHerds.enabled = false
     expect(validateStatusMessageRequest(mockedLogger, validInputMessage)).toBeTruthy()
+    expect(mockSetBindingsLogger).toHaveBeenCalledTimes(0)
+  })
+
+  test('returns true if the validation is successful and multiHerds is enabled', () => {
+    config.multiHerds.enabled = true
+    const message = {
+      ...validInputMessage,
+      herdName: 'Commercial herd'
+    }
+    expect(validateStatusMessageRequest(mockedLogger, message)).toBeTruthy()
     expect(mockSetBindingsLogger).toHaveBeenCalledTimes(0)
   })
 
@@ -64,6 +80,20 @@ describe('validateStatusMessageRequest', () => {
 
     test('returns false when validation fails due to invalid dateTime field', () => {
       const invalidMessage = { ...validInputMessage, dateTime: 'notADate' }
+
+      expectFalseyResultAndValidationErrorSetInLogBinding(invalidMessage)
+    })
+
+    test('returns false when validation fails due to invalid herdName field and multi herds is enabled', () => {
+      config.multiHerds.enabled = true
+      const invalidMessage = { ...validInputMessage, herdName: 1 }
+
+      expectFalseyResultAndValidationErrorSetInLogBinding(invalidMessage)
+    })
+
+    test('returns false when validation fails due to missing herdName', () => {
+      config.multiHerds.enabled = true
+      const invalidMessage = { ...validInputMessage }
 
       expectFalseyResultAndValidationErrorSetInLogBinding(invalidMessage)
     })

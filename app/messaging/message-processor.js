@@ -34,8 +34,11 @@ const processInCheckStatusMessage = async (message, logger) => {
       reviewTestResults,
       piHuntRecommended,
       piHuntAllAnimals,
-      herdName,
       logger
+    }
+
+    if (config.multiHerds.enabled) {
+      requestParams.herdName = herdName
     }
 
     if (config.evidenceCarbonCopyEmailAddress) {

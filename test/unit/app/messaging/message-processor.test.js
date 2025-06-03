@@ -14,7 +14,10 @@ jest.mock('../../../../app/config/index.js', () => ({
     evidenceEmail: {
       enabled: true
     },
-    evidenceCarbonCopyEmailAddress: 'cc-email@gmail.com'
+    evidenceCarbonCopyEmailAddress: 'cc-email@gmail.com',
+    multiHerds: {
+      enabled: false
+    }
   }
 }))
 
@@ -37,6 +40,7 @@ describe('process Message', () => {
   afterEach(() => {
     config.evidenceEmail.enabled = true
     config.evidenceCarbonCopyEmailAddress = 'cc-email@gmail.com'
+    config.multiHerds.enabled = false
   })
 
   test('should send an evidence email when it is the first time the claim has the status of in check', async () => {
@@ -51,8 +55,7 @@ describe('process Message', () => {
         typeOfLivestock: 'beef',
         reviewTestResults: 'positive',
         piHuntRecommended: 'yes',
-        piHuntAllAnimals: 'no',
-        herdName: 'Commercial herd'
+        piHuntAllAnimals: 'no'
       },
       messageId: 1
     }
@@ -85,8 +88,7 @@ describe('process Message', () => {
       orgName: 'Willow Farm',
       reviewTestResults: 'positive',
       piHuntRecommended: 'yes',
-      piHuntAllAnimals: 'no',
-      herdName: 'Commercial herd'
+      piHuntAllAnimals: 'no'
     })
     expect(sendEvidenceEmail).toHaveBeenCalledWith({
       addressType: 'orgEmail',
@@ -101,8 +103,7 @@ describe('process Message', () => {
       orgName: 'Willow Farm',
       reviewTestResults: 'positive',
       piHuntRecommended: 'yes',
-      piHuntAllAnimals: 'no',
-      herdName: 'Commercial herd'
+      piHuntAllAnimals: 'no'
     })
     expect(sendEvidenceEmail).toHaveBeenCalledWith({
       addressType: 'email',
@@ -117,8 +118,7 @@ describe('process Message', () => {
       orgName: 'Willow Farm',
       reviewTestResults: 'positive',
       piHuntRecommended: 'yes',
-      piHuntAllAnimals: 'no',
-      herdName: 'Commercial herd'
+      piHuntAllAnimals: 'no'
     })
     expect(set).toHaveBeenCalledWith({
       agreementReference: 'AHWR-0AD3-3322',
@@ -134,8 +134,7 @@ describe('process Message', () => {
         typeOfLivestock: 'beef',
         reviewTestResults: 'positive',
         piHuntRecommended: 'yes',
-        piHuntAllAnimals: 'no',
-        herdName: 'Commercial herd'
+        piHuntAllAnimals: 'no'
       }
     })
   })
@@ -327,5 +326,107 @@ describe('process Message', () => {
     expect(sendEvidenceEmail).toHaveBeenCalledTimes(1)
     expect(mockDeadLetterMessage).toHaveBeenCalledWith(event)
     expect(mockedLogger.error).toHaveBeenCalledWith('Unable to complete message generation request: Error: SFD validation error')
+  })
+
+  test('should send an evidence email when multi herds is enabled', async () => {
+    const event = {
+      body: {
+        crn: '1100014934',
+        sbi: '106705779',
+        agreementReference: 'AHWR-0AD3-3322',
+        claimReference: 'TEMP-O9UD-22F6',
+        claimStatus: 5,
+        claimType: 'R',
+        typeOfLivestock: 'beef',
+        reviewTestResults: 'positive',
+        piHuntRecommended: 'yes',
+        piHuntAllAnimals: 'no',
+        herdName: 'Commercial herd'
+      },
+      messageId: 1
+    }
+    validateStatusMessageRequest.mockReturnValueOnce(true)
+    getByClaimRefAndMessageType.mockResolvedValueOnce(null)
+    getLatestContactDetails.mockResolvedValueOnce({
+      name: 'Willow Farm',
+      orgEmail: 'willowfarm@gmail.com',
+      farmerName: 'John Jim Doe',
+      email: 'john.doe@gmail.com'
+    })
+    config.multiHerds.enabled = true
+
+    await processMessage(mockedLogger, event, mockMessageReceiver)
+
+    expect(validateStatusMessageRequest).toHaveBeenCalledTimes(1)
+    expect(mockCompleteMessage).toHaveBeenCalledTimes(1)
+    expect(mockedLogger.info).toHaveBeenCalledTimes(1)
+    expect(getByClaimRefAndMessageType).toHaveBeenCalledWith('TEMP-O9UD-22F6', 'statusChange-5')
+    expect(getLatestContactDetails).toHaveBeenCalledWith('AHWR-0AD3-3322', mockedLogger)
+    expect(sendEvidenceEmail).toHaveBeenCalledWith({
+      addressType: 'CC',
+      emailAddress: 'cc-email@gmail.com',
+      agreementReference: 'AHWR-0AD3-3322',
+      claimReference: 'TEMP-O9UD-22F6',
+      crn: '1100014934',
+      sbi: '106705779',
+      claimType: 'R',
+      typeOfLivestock: 'beef',
+      logger: mockedLogger,
+      orgName: 'Willow Farm',
+      reviewTestResults: 'positive',
+      piHuntRecommended: 'yes',
+      piHuntAllAnimals: 'no',
+      herdName: 'Commercial herd'
+    })
+    expect(sendEvidenceEmail).toHaveBeenCalledWith({
+      addressType: 'orgEmail',
+      emailAddress: 'willowfarm@gmail.com',
+      agreementReference: 'AHWR-0AD3-3322',
+      claimReference: 'TEMP-O9UD-22F6',
+      crn: '1100014934',
+      sbi: '106705779',
+      claimType: 'R',
+      typeOfLivestock: 'beef',
+      logger: mockedLogger,
+      orgName: 'Willow Farm',
+      reviewTestResults: 'positive',
+      piHuntRecommended: 'yes',
+      piHuntAllAnimals: 'no',
+      herdName: 'Commercial herd'
+    })
+    expect(sendEvidenceEmail).toHaveBeenCalledWith({
+      addressType: 'email',
+      emailAddress: 'john.doe@gmail.com',
+      agreementReference: 'AHWR-0AD3-3322',
+      claimReference: 'TEMP-O9UD-22F6',
+      crn: '1100014934',
+      sbi: '106705779',
+      claimType: 'R',
+      typeOfLivestock: 'beef',
+      logger: mockedLogger,
+      orgName: 'Willow Farm',
+      reviewTestResults: 'positive',
+      piHuntRecommended: 'yes',
+      piHuntAllAnimals: 'no',
+      herdName: 'Commercial herd'
+    })
+    expect(set).toHaveBeenCalledWith({
+      agreementReference: 'AHWR-0AD3-3322',
+      claimReference: 'TEMP-O9UD-22F6',
+      messageType: 'statusChange-5',
+      data: {
+        orgName: 'Willow Farm',
+        orgEmail: 'willowfarm@gmail.com',
+        email: 'john.doe@gmail.com',
+        crn: '1100014934',
+        sbi: '106705779',
+        claimType: 'R',
+        typeOfLivestock: 'beef',
+        reviewTestResults: 'positive',
+        piHuntRecommended: 'yes',
+        piHuntAllAnimals: 'no',
+        herdName: 'Commercial herd'
+      }
+    })
   })
 })
