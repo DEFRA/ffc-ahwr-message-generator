@@ -1,5 +1,5 @@
 import joi from 'joi'
-import { config } from '../config'
+import { config } from '../config/index.js'
 
 const CRN_MIN_VALUE = 1050000000
 const CRN_MAX_VALUE = 9999999999
