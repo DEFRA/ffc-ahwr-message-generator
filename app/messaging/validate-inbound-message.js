@@ -1,5 +1,4 @@
 import joi from 'joi'
-import { config } from '../config/index.js'
 
 const CRN_MIN_VALUE = 1050000000
 const CRN_MAX_VALUE = 9999999999
@@ -22,11 +21,8 @@ export const buildInboundStatusMessageSchema = () => {
     dateTime: joi.date().iso().required(),
     reviewTestResults: joi.string().optional(),
     piHuntRecommended: joi.string().optional(),
-    piHuntAllAnimals: joi.string().optional()
-  }
-
-  if (config.multiHerds.enabled) {
-    schema.herdName = joi.string().required()
+    piHuntAllAnimals: joi.string().optional(),
+    herdName: joi.string().required()
   }
 
   return joi.object(schema)

@@ -14,10 +14,7 @@ export const getConfig = () => {
     evidenceReviewTemplateId: joi.string().uuid(),
     emailReplyToId: joi.string().uuid(),
     evidenceFollowUpTemplateId: joi.string().uuid(),
-    sfdRequestMsgType: joi.string(),
-    multiHerds: {
-      enabled: joi.bool()
-    }
+    sfdRequestMsgType: joi.string()
   })
 
   const config = {
@@ -32,10 +29,7 @@ export const getConfig = () => {
     evidenceReviewTemplateId: process.env.EVIDENCE_REVIEW_TEMPLATE_ID,
     emailReplyToId: process.env.EMAIL_REPLY_TO_ID,
     evidenceFollowUpTemplateId: process.env.EVIDENCE_FOLLOW_UP_TEMPLATE_ID,
-    sfdRequestMsgType: 'uk.gov.ffc.ahwr.sfd.request',
-    multiHerds: {
-      enabled: process.env.MULTI_HERDS_ENABLED === 'true'
-    }
+    sfdRequestMsgType: 'uk.gov.ffc.ahwr.sfd.request'
   }
 
   const { error } = schema.validate(config, {
