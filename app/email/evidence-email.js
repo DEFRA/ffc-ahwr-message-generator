@@ -28,12 +28,21 @@ const getFollowUpBulletPoints = (typeOfLivestock, reviewTestResults, piHuntRecom
   return []
 }
 
+const getHerdNameLabel = (typeOfLivestock) => typeOfLivestock === SHEEP ? 'Flock name' : 'Herd name'
+
+const LIVESTOCK_TO_READABLE_SPECIES = {
+  beef: 'Beef cattle',
+  dairy: 'Dairy cattle',
+  pigs: 'Pigs',
+  sheep: 'Sheep'
+}
+
 export const formatBullets = (bullets = []) => bullets.map((bullet) => `* ${bullet}`)
   .join('\n')
 
 export const sendEvidenceEmail = async (params) => {
   const {
-    emailAddress, agreementReference, claimReference, sbi, crn, logger, addressType, orgName, claimType, typeOfLivestock, reviewTestResults, piHuntRecommended, piHuntAllAnimals
+    emailAddress, agreementReference, claimReference, sbi, crn, logger, addressType, orgName, claimType, typeOfLivestock, reviewTestResults, piHuntRecommended, piHuntAllAnimals, herdName
   } = params
   logger.info(`Sending ${addressType} evidence email`)
 
@@ -56,7 +65,10 @@ export const sendEvidenceEmail = async (params) => {
       orgName,
       claimReference,
       agreementReference,
-      customSpeciesBullets: formatBullets(bulletPoints)
+      customSpeciesBullets: formatBullets(bulletPoints),
+      herdNameLabel: getHerdNameLabel(typeOfLivestock),
+      herdName,
+      species: LIVESTOCK_TO_READABLE_SPECIES[typeOfLivestock]
     }
 
     await sendSFDEmail({
