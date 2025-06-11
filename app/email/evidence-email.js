@@ -30,6 +30,13 @@ const getFollowUpBulletPoints = (typeOfLivestock, reviewTestResults, piHuntRecom
 
 const getHerdNameLabel = (typeOfLivestock) => typeOfLivestock === SHEEP ? 'Flock name' : 'Herd name'
 
+const LIVESTOCK_TO_READABLE_SPECIES = {
+  beef: 'Beef cattle',
+  dairy: 'Dairy cattle',
+  pigs: 'Pigs',
+  sheep: 'Sheep'
+}
+
 export const formatBullets = (bullets = []) => bullets.map((bullet) => `* ${bullet}`)
   .join('\n')
 
@@ -60,7 +67,8 @@ export const sendEvidenceEmail = async (params) => {
       agreementReference,
       customSpeciesBullets: formatBullets(bulletPoints),
       herdNameLabel: getHerdNameLabel(typeOfLivestock),
-      herdName
+      herdName,
+      species: LIVESTOCK_TO_READABLE_SPECIES[typeOfLivestock]
     }
 
     await sendSFDEmail({

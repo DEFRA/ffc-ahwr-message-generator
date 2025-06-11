@@ -46,12 +46,12 @@ const baseParams = {
 describe('sendEvidenceEmail', () => {
   describe('Review Emails', () => {
     test.each([
-      { livestock: BEEF, expectedBullets: formatBullets(REVIEW_CATTLE) },
-      { livestock: DAIRY, expectedBullets: formatBullets(REVIEW_CATTLE) },
-      { livestock: PIGS, expectedBullets: formatBullets(REVIEW_PIGS) },
-      { livestock: SHEEP, expectedBullets: formatBullets(REVIEW_SHEEP) },
+      { livestock: BEEF, expectedBullets: formatBullets(REVIEW_CATTLE), speciesLabel: 'Beef cattle' },
+      { livestock: DAIRY, expectedBullets: formatBullets(REVIEW_CATTLE), speciesLabel: 'Dairy cattle' },
+      { livestock: PIGS, expectedBullets: formatBullets(REVIEW_PIGS), speciesLabel: 'Pigs' },
+      { livestock: SHEEP, expectedBullets: formatBullets(REVIEW_SHEEP), speciesLabel: 'Sheep' },
       { livestock: 'Goats', expectedBullets: '' } // unknown livestock
-    ])('should send correct review email for $livestock', async ({ livestock, expectedBullets }) => {
+    ])('should send correct review email for $livestock', async ({ livestock, expectedBullets, speciesLabel }) => {
       const params = {
         ...baseParams,
         claimType: 'R',
@@ -76,7 +76,8 @@ describe('sendEvidenceEmail', () => {
           agreementReference: params.agreementReference,
           customSpeciesBullets: expectedBullets,
           herdName: params.herdName,
-          herdNameLabel: livestock === SHEEP ? 'Flock name' : 'Herd name'
+          herdNameLabel: livestock === SHEEP ? 'Flock name' : 'Herd name',
+          species: speciesLabel
         },
         logger: mockLogger
       })
@@ -117,7 +118,8 @@ describe('sendEvidenceEmail', () => {
         customParams: expect.objectContaining({
           customSpeciesBullets: formatBullets(FOLLOW_UP_CATTLE_POSITIVE),
           herdName: 'Commercial herd',
-          herdNameLabel: 'Herd name'
+          herdNameLabel: 'Herd name',
+          species: 'Beef cattle'
         })
       }))
       expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith(expect.objectContaining({
@@ -142,7 +144,8 @@ describe('sendEvidenceEmail', () => {
       expect(sendSFDEmail).toHaveBeenCalledWith(expect.objectContaining({
         notifyTemplateId: mockConfig.evidenceFollowUpTemplateId,
         customParams: expect.objectContaining({
-          customSpeciesBullets: formatBullets(FOLLOW_UP_CATTLE_NEGATIVE)
+          customSpeciesBullets: formatBullets(FOLLOW_UP_CATTLE_NEGATIVE),
+          species: 'Dairy cattle'
         })
       }))
       expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith(expect.objectContaining({
@@ -191,7 +194,8 @@ describe('sendEvidenceEmail', () => {
       expect(sendSFDEmail).toHaveBeenCalledWith(expect.objectContaining({
         notifyTemplateId: mockConfig.evidenceFollowUpTemplateId,
         customParams: expect.objectContaining({
-          customSpeciesBullets: formatBullets(FOLLOW_UP_PIGS)
+          customSpeciesBullets: formatBullets(FOLLOW_UP_PIGS),
+          species: 'Pigs'
         })
       }))
       expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith(expect.objectContaining({
@@ -216,7 +220,8 @@ describe('sendEvidenceEmail', () => {
         customParams: expect.objectContaining({
           customSpeciesBullets: formatBullets(FOLLOW_UP_SHEEP),
           herdName: 'Commercial herd',
-          herdNameLabel: 'Flock name'
+          herdNameLabel: 'Flock name',
+          species: 'Sheep'
         })
       }))
       expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith(expect.objectContaining({
