@@ -39,6 +39,7 @@ const baseParams = {
   sbi: '106705779',
   addressType: 'email',
   orgName: 'Willow Farm',
+  herdName: 'Commercial herd',
   logger: mockLogger
 }
 
@@ -73,7 +74,9 @@ describe('sendEvidenceEmail', () => {
           orgName: params.orgName,
           claimReference: params.claimReference,
           agreementReference: params.agreementReference,
-          customSpeciesBullets: expectedBullets
+          customSpeciesBullets: expectedBullets,
+          herdName: params.herdName,
+          herdNameLabel: livestock === SHEEP ? 'Flock name' : 'Herd name'
         },
         logger: mockLogger
       })
@@ -112,7 +115,9 @@ describe('sendEvidenceEmail', () => {
       expect(sendSFDEmail).toHaveBeenCalledWith(expect.objectContaining({
         notifyTemplateId: mockConfig.evidenceFollowUpTemplateId,
         customParams: expect.objectContaining({
-          customSpeciesBullets: formatBullets(FOLLOW_UP_CATTLE_POSITIVE)
+          customSpeciesBullets: formatBullets(FOLLOW_UP_CATTLE_POSITIVE),
+          herdName: 'Commercial herd',
+          herdNameLabel: 'Herd name'
         })
       }))
       expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith(expect.objectContaining({
@@ -209,7 +214,9 @@ describe('sendEvidenceEmail', () => {
       expect(sendSFDEmail).toHaveBeenCalledWith(expect.objectContaining({
         notifyTemplateId: mockConfig.evidenceFollowUpTemplateId,
         customParams: expect.objectContaining({
-          customSpeciesBullets: formatBullets(FOLLOW_UP_SHEEP)
+          customSpeciesBullets: formatBullets(FOLLOW_UP_SHEEP),
+          herdName: 'Commercial herd',
+          herdNameLabel: 'Flock name'
         })
       }))
       expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith(expect.objectContaining({
