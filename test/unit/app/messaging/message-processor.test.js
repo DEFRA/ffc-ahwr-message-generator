@@ -51,7 +51,8 @@ describe('process Message', () => {
         typeOfLivestock: 'beef',
         reviewTestResults: 'positive',
         piHuntRecommended: 'yes',
-        piHuntAllAnimals: 'no'
+        piHuntAllAnimals: 'no',
+        herdName: 'Commercial herd'
       },
       messageId: 1
     }
@@ -84,7 +85,8 @@ describe('process Message', () => {
       orgName: 'Willow Farm',
       reviewTestResults: 'positive',
       piHuntRecommended: 'yes',
-      piHuntAllAnimals: 'no'
+      piHuntAllAnimals: 'no',
+      herdName: 'Commercial herd'
     })
     expect(sendEvidenceEmail).toHaveBeenCalledWith({
       addressType: 'orgEmail',
@@ -99,7 +101,8 @@ describe('process Message', () => {
       orgName: 'Willow Farm',
       reviewTestResults: 'positive',
       piHuntRecommended: 'yes',
-      piHuntAllAnimals: 'no'
+      piHuntAllAnimals: 'no',
+      herdName: 'Commercial herd'
     })
     expect(sendEvidenceEmail).toHaveBeenCalledWith({
       addressType: 'email',
@@ -114,9 +117,9 @@ describe('process Message', () => {
       orgName: 'Willow Farm',
       reviewTestResults: 'positive',
       piHuntRecommended: 'yes',
-      piHuntAllAnimals: 'no'
+      piHuntAllAnimals: 'no',
+      herdName: 'Commercial herd'
     })
-
     expect(set).toHaveBeenCalledWith({
       agreementReference: 'AHWR-0AD3-3322',
       claimReference: 'TEMP-O9UD-22F6',
@@ -131,7 +134,8 @@ describe('process Message', () => {
         typeOfLivestock: 'beef',
         reviewTestResults: 'positive',
         piHuntRecommended: 'yes',
-        piHuntAllAnimals: 'no'
+        piHuntAllAnimals: 'no',
+        herdName: 'Commercial herd'
       }
     })
   })

@@ -13,7 +13,8 @@ const validInputMessage = {
   claimStatus: 2,
   claimType: 'R',
   typeOfLivestock: 'beef',
-  dateTime: new Date()
+  dateTime: new Date(),
+  herdName: 'Commercial herd'
 }
 
 describe('validateStatusMessageRequest', () => {
@@ -64,6 +65,18 @@ describe('validateStatusMessageRequest', () => {
 
     test('returns false when validation fails due to invalid dateTime field', () => {
       const invalidMessage = { ...validInputMessage, dateTime: 'notADate' }
+
+      expectFalseyResultAndValidationErrorSetInLogBinding(invalidMessage)
+    })
+
+    test('returns false when validation fails due to invalid herdName field', () => {
+      const invalidMessage = { ...validInputMessage, herdName: 1 }
+
+      expectFalseyResultAndValidationErrorSetInLogBinding(invalidMessage)
+    })
+
+    test('returns false when validation fails due to missing herdName', () => {
+      const invalidMessage = { ...validInputMessage, herdName: undefined }
 
       expectFalseyResultAndValidationErrorSetInLogBinding(invalidMessage)
     })
