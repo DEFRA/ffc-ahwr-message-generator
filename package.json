@@ -27,7 +27,7 @@
     "ffc-messaging": "^2.10.1",
     "hapi-pino": "12.1.0",
     "joi": "17.13.3",
-    "pg": "^8.13.1",
+    "pg": "^8.14.1",
     "sequelize": "^6.37.5",
     "ffc-ahwr-common-library": "^2.0.4"
   },
