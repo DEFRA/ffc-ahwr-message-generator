@@ -1,1 +1,2 @@
 container.sfdMessageQueueAddress: queue:ffc-ahwr-sfd-message
+container.messageGeneratorQueueAddress: queue:ffc-ahwr-message-generator
