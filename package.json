@@ -21,15 +21,15 @@
   ],
   "license": "OGL-UK-3.0",
   "dependencies": {
-    "@azure/identity": "^4.5.0",
-    "@hapi/hapi": "21.3.2",
+    "@azure/identity": "^4.8.0",
+    "@hapi/hapi": "21.4.0",
     "applicationinsights": "2.9.6",
     "ffc-messaging": "^2.10.1",
     "hapi-pino": "12.1.0",
     "joi": "17.13.3",
-    "pg": "^8.13.1",
-    "sequelize": "^6.37.5",
-    "ffc-ahwr-common-library": "^2.0.4"
+    "pg": "^8.14.1",
+    "sequelize": "^6.37.6",
+    "ffc-ahwr-common-library": "^2.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.26.10",
