@@ -3,13 +3,15 @@ import { startMessageReceiver, stopMessageReceiver } from './messaging/index.js'
 import { createServer } from './server.js'
 
 const init = async () => {
+  const appInsightsRunning = setup()
   const server = await createServer()
   await server.start()
-  setup(server.logger)
+  server.logger.setBindings({ appInsightsRunning })
 
   await startMessageReceiver(server.logger)
 
   server.logger.info(`Server running on ${server.info.uri}`)
+  server.logger.info(`App insights ${appInsightsRunning ? '' : 'not '}running`)
 
   process.on('unhandledRejection', async (err) => {
     server.logger.error(err, 'unhandledRejection')
