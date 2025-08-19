@@ -17,7 +17,7 @@ export const getConfig = () => {
     sfdRequestMsgType: joi.string()
   })
 
-  const config = {
+  const mainConfig = {
     env: process.env.NODE_ENV || 'development',
     isDev: process.env.NODE_ENV === 'development',
     port: Number(process.env.PORT) || DEFAULT_PORT,
@@ -32,7 +32,7 @@ export const getConfig = () => {
     sfdRequestMsgType: 'uk.gov.ffc.ahwr.sfd.request'
   }
 
-  const { error } = schema.validate(config, {
+  const { error } = schema.validate(mainConfig, {
     abortEarly: false,
     convert: false
   })
@@ -41,7 +41,7 @@ export const getConfig = () => {
     throw new Error(`The server config is invalid. ${error.message}`)
   }
 
-  return config
+  return mainConfig
 }
 
 export const config = getConfig()
