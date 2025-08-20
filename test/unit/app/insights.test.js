@@ -23,7 +23,7 @@ jest.mock('applicationinsights', () => {
 describe('Application Insights', () => {
   test('sets up insights when the connection string env var is defined', () => {
     process.env.APPINSIGHTS_CLOUDROLE = 'test-app'
-    process.env.APPINSIGHTS_CONNECTIONSTRING = 'something'
+    process.env.APPLICATIONINSIGHTS_CONNECTION_STRING = 'something'
 
     const result = setup()
 
@@ -32,7 +32,7 @@ describe('Application Insights', () => {
   })
 
   test('sets up insights when the connection string env var is defined - using default app name', () => {
-    process.env.APPINSIGHTS_CONNECTIONSTRING = 'something'
+    process.env.APPLICATIONINSIGHTS_CONNECTION_STRING = 'something'
 
     const result = setup()
 
@@ -41,7 +41,7 @@ describe('Application Insights', () => {
   })
 
   test('logs not running when env var does not exist', () => {
-    delete process.env.APPINSIGHTS_CONNECTIONSTRING
+    delete process.env.APPLICATIONINSIGHTS_CONNECTION_STRING
     const result = setup()
 
     expect(result).toBeFalsy()
