@@ -55,6 +55,6 @@ export const redactPII = async (agreementReference, logger) => {
   if (totalUpdates > 0) {
     logger.info(`Redacted ${totalUpdates} fields for agreementReference: ${agreementReference}`)
   } else {
-    logger.info(`No messages updated for agreementReference: ${agreementReference}`)
+    logger.info(`No fields redacted for agreementReference: ${agreementReference}`)
   }
 }
