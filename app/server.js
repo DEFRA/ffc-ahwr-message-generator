@@ -2,6 +2,7 @@ import hapi from '@hapi/hapi'
 import joi from 'joi'
 import { config } from './config/index.js'
 import { healthRoutes } from './routes/health.js'
+import { redactPiiRequestHandlers } from './routes/redact-pii.js'
 import logger from './logger.js'
 
 export const createServer = async () => {
@@ -13,7 +14,7 @@ export const createServer = async () => {
 
   await server.register([logger])
 
-  server.route([...healthRoutes])
+  server.route([...healthRoutes, ...redactPiiRequestHandlers])
 
   return server
 }

@@ -1,12 +1,14 @@
-import { set, getByClaimRefAndMessageType } from '../../../../app/repositories/message-generate-repository.js'
+import { set, getByClaimRefAndMessageType, redactPII } from '../../../../app/repositories/message-generate-repository.js'
 import dataModeller from '../../../../app/data/index.js'
+import { Op } from 'sequelize'
 
 jest.mock('../../../../app/data/index.js', () => {
   return {
     models: {
       messageGenerate: {
         create: jest.fn(),
-        findOne: jest.fn()
+        findOne: jest.fn(),
+        update: jest.fn()
       }
     }
   }
@@ -65,6 +67,71 @@ describe('message generate repository', () => {
           messageType: 'statusUpdate-5'
         }
       })
+    })
+  })
+
+  describe('redactPII', () => {
+    const mockLogger = { info: jest.fn() }
+
+    beforeEach(async () => {
+      jest.clearAllMocks()
+    })
+
+    test('should call messageGenerate.update with correct parameters', async () => {
+      const agreementReference = 'AHWR-123'
+      const mockUpdatedRows = [{ id: 1 }, { id: 2 }]
+      dataModeller.models.messageGenerate.update.mockResolvedValue([mockUpdatedRows.length, mockUpdatedRows])
+
+      await redactPII(agreementReference, mockLogger)
+
+      expect(dataModeller.models.messageGenerate.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.any(Object) }),
+        expect.objectContaining({
+          where: {
+            agreementReference: 'AHWR-123',
+            [Op.and]: { val: "data->'email' IS NOT NULL" }
+          }
+        })
+      )
+      expect(dataModeller.models.messageGenerate.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.any(Object) }),
+        expect.objectContaining({
+          where: {
+            agreementReference: 'AHWR-123',
+            [Op.and]: { val: "data->'orgName' IS NOT NULL" }
+          }
+        })
+      )
+      expect(dataModeller.models.messageGenerate.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.any(Object) }),
+        expect.objectContaining({
+          where: {
+            agreementReference: 'AHWR-123',
+            [Op.and]: { val: "data->'orgEmail' IS NOT NULL" }
+          }
+        })
+      )
+      expect(dataModeller.models.messageGenerate.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.any(Object) }),
+        expect.objectContaining({
+          where: {
+            agreementReference: 'AHWR-123',
+            [Op.and]: { val: "data->'herdName' IS NOT NULL" }
+          }
+        })
+      )
+      expect(mockLogger.info).toHaveBeenCalledWith('Redacted 8 fields for agreementReference: AHWR-123')
+    })
+
+    test('should log when no messages are updated', async () => {
+      const agreementReference = 'AHWR-123'
+      dataModeller.models.messageGenerate.update.mockResolvedValue([0, []])
+
+      await redactPII(agreementReference, mockLogger)
+
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        `No messages updated for agreementReference: ${agreementReference}`
+      )
     })
   })
 })
