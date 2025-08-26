@@ -22,7 +22,7 @@ describe('redact-pii', () => {
     test('should return OK status when called with agreementsToRedact in payload', async () => {
       const res = await server.inject({ method: 'POST', url: '/api/redact/pii', payload: { agreementsToRedact: mockAgreementsToRedact } })
 
-    expect(redactPII).toHaveBeenCalledTimes(2)
+      expect(redactPII).toHaveBeenCalledTimes(2)
       expect(redactPII).toHaveBeenCalledWith('FAKE-REF-1', expect.any(Object))
       expect(redactPII).toHaveBeenCalledWith('FAKE-REF-2', expect.any(Object))
       expect(res.statusCode).toBe(HttpStatus.OK)
