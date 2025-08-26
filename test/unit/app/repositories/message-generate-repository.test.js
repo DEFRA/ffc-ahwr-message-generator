@@ -130,7 +130,7 @@ describe('message generate repository', () => {
       await redactPII(agreementReference, mockLogger)
 
       expect(mockLogger.info).toHaveBeenCalledWith(
-        `No messages updated for agreementReference: ${agreementReference}`
+        `No fields redacted for agreementReference: ${agreementReference}`
       )
     })
   })
