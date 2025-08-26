@@ -11,9 +11,13 @@ export const getConfig = () => {
     },
     applicationApiUri: joi.string().uri(),
     evidenceCarbonCopyEmailAddress: joi.string().email().allow(null, ''),
+    carbonCopyEmailAddress: joi.string().email().allow(null, ''),
     evidenceReviewTemplateId: joi.string().uuid(),
     emailReplyToId: joi.string().uuid(),
+    noReplyEmailReplyToId: joi.string().uuid(),
     evidenceFollowUpTemplateId: joi.string().uuid(),
+    reviewCompleteTemplateId: joi.string().uuid(),
+    followupCompleteTemplateId: joi.string().uuid(),
     sfdRequestMsgType: joi.string()
   })
 
@@ -26,9 +30,13 @@ export const getConfig = () => {
     },
     applicationApiUri: process.env.APPLICATION_API_URI,
     evidenceCarbonCopyEmailAddress: process.env.EVIDENCE_CARBON_COPY_EMAIL_ADDRESS,
+    carbonCopyEmailAddress: process.env.CARBON_COPY_EMAIL_ADDRESS,
     evidenceReviewTemplateId: process.env.EVIDENCE_REVIEW_TEMPLATE_ID,
     emailReplyToId: process.env.EMAIL_REPLY_TO_ID,
+    noReplyEmailReplyToId: process.env.NO_REPLY_EMAIL_REPLY_TO_ID,
     evidenceFollowUpTemplateId: process.env.EVIDENCE_FOLLOW_UP_TEMPLATE_ID,
+    reviewCompleteTemplateId: process.env.REVIEW_COMPLETE_TEMPLATE_ID,
+    followupCompleteTemplateId: process.env.FOLLOW_UP_COMPLETE_TEMPLATE_ID,
     sfdRequestMsgType: 'uk.gov.ffc.ahwr.sfd.request'
   }
 

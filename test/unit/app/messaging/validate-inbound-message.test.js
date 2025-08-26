@@ -23,6 +23,11 @@ describe('validateStatusMessageRequest', () => {
     expect(mockSetBindingsLogger).toHaveBeenCalledTimes(0)
   })
 
+  test('returns true if the validation is successful, including optional amount', () => {
+    expect(validateStatusMessageRequest(mockedLogger, { ...validInputMessage, claimAmount: 456 })).toBeTruthy()
+    expect(mockSetBindingsLogger).toHaveBeenCalledTimes(0)
+  })
+
   describe('invalid input message produce validation error', () => {
     function expectFalseyResultAndValidationErrorSetInLogBinding (message) {
       expect(validateStatusMessageRequest(mockedLogger, message)).toBeFalsy()
