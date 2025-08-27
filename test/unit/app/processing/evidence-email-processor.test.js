@@ -154,6 +154,71 @@ describe('process evidence email message', () => {
     })
   })
 
+  test('should not send an evidence email to email address if it is the same as orgEmail', async () => {
+    const event = {
+      body: {
+        crn: '1100014934',
+        sbi: '106705779',
+        agreementReference: 'AHWR-0AD3-3322',
+        claimReference: 'TEMP-O9UD-22F6',
+        claimStatus: 5,
+        claimType: 'R',
+        typeOfLivestock: 'sheep'
+      },
+      messageId: 1
+    }
+
+    getByClaimRefAndMessageType.mockResolvedValueOnce(null)
+    getLatestContactDetails.mockResolvedValueOnce({
+      farmerName: 'John Jim Doe',
+      email: 'willowfarm@gmail.com',
+      name: 'Willow Farm',
+      orgEmail: 'willowfarm@gmail.com'
+    })
+    config.evidenceCarbonCopyEmailAddress = undefined
+
+    await processInCheckStatusMessageForEvidenceEmail(event, mockedLogger)
+
+    expect(getByClaimRefAndMessageType).toHaveBeenCalledWith('TEMP-O9UD-22F6', 'statusChange-5')
+    expect(getLatestContactDetails).toHaveBeenCalledWith('AHWR-0AD3-3322', mockedLogger)
+    expect(sendEvidenceEmail).toHaveBeenCalledTimes(1)
+
+    expect(sendEvidenceEmail).toHaveBeenCalledWith({
+      addressType: 'orgEmail',
+      emailAddress: 'willowfarm@gmail.com',
+      agreementReference: 'AHWR-0AD3-3322',
+      claimReference: 'TEMP-O9UD-22F6',
+      crn: '1100014934',
+      sbi: '106705779',
+      claimType: 'R',
+      typeOfLivestock: 'sheep',
+      logger: mockedLogger,
+      orgName: 'Willow Farm',
+      reviewTestResults: undefined,
+      piHuntRecommended: undefined,
+      piHuntAllAnimals: undefined,
+      herdName: undefined
+    })
+    expect(set).toHaveBeenCalledWith({
+      agreementReference: 'AHWR-0AD3-3322',
+      claimReference: 'TEMP-O9UD-22F6',
+      messageType: 'statusChange-5',
+      data: {
+        email: 'willowfarm@gmail.com',
+        orgEmail: 'willowfarm@gmail.com',
+        crn: '1100014934',
+        sbi: '106705779',
+        claimType: 'R',
+        typeOfLivestock: 'sheep',
+        orgName: 'Willow Farm',
+        reviewTestResults: undefined,
+        piHuntRecommended: undefined,
+        piHuntAllAnimals: undefined,
+        herdName: undefined
+      }
+    })
+  })
+
   test('should not send an evidence email when the claim has previously had a status of in check', async () => {
     const event = {
       body: {

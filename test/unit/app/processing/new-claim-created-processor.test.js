@@ -1,8 +1,10 @@
-import { config } from '../../../../app/config/index.js'
+import { config as mockConfig, config } from '../../../../app/config/index.js'
 import { getByClaimRefAndMessageType, set } from '../../../../app/repositories/message-generate-repository.js'
 import { getLatestContactDetails } from '../../../../app/api/application-api.js'
 import { processNewClaimCreated } from '../../../../app/processing/new-claim-created-processor.js'
 import { sendSFDEmail } from '../../../../app/lib/sfd-client.js'
+import appInsights from 'applicationinsights'
+import { sendEvidenceEmail } from '../../../../app/email/evidence-email.js'
 
 jest.mock('../../../../app/repositories/message-generate-repository.js')
 jest.mock('../../../../app/api/application-api.js')
@@ -29,7 +31,7 @@ const mockedLogger = {
   error: jest.fn()
 }
 
-describe('process evidence email message', () => {
+describe('process new claim email message', () => {
   afterEach(() => {
     jest.resetAllMocks()
     config.carbonCopyEmailAddress = 'cc@example.com'
@@ -48,7 +50,7 @@ describe('process evidence email message', () => {
     herdName: 'Commercial herd'
   }
 
-  const checkNewClaimEmailSendCalled = (emailAddress, notifyTemplateId,
+  const checkNewClaimEmailSendAndEventRaised = (emailAddress, notifyTemplateId, addressType,
     species = 'Beef cattle', herdNameLabel = 'Herd name', claimReference = 'REBC-O9UD-22F6') => {
     expect(sendSFDEmail).toHaveBeenCalledWith({
       emailAddress,
@@ -70,6 +72,16 @@ describe('process evidence email message', () => {
       },
       logger: mockedLogger
     })
+
+    expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledWith({
+      name: 'claim-email-requested',
+      properties: {
+        status: true,
+        claimReference,
+        addressType,
+        templateId: notifyTemplateId
+      }
+    })
   }
 
   test('should send a new claim email when it is the first time the claim has passed through', async () => {
@@ -90,9 +102,9 @@ describe('process evidence email message', () => {
     expect(getByClaimRefAndMessageType).toHaveBeenCalledWith('REBC-O9UD-22F6', 'claimCreated')
     expect(getLatestContactDetails).toHaveBeenCalledWith('IAHW-0AD3-3322', mockedLogger)
     expect(sendSFDEmail).toHaveBeenCalledTimes(3)
-    checkNewClaimEmailSendCalled('cc@example.com', 'review-complete-template-id')
-    checkNewClaimEmailSendCalled('willowfarm@gmail.com', 'review-complete-template-id')
-    checkNewClaimEmailSendCalled('john.doe@gmail.com', 'review-complete-template-id')
+    checkNewClaimEmailSendAndEventRaised('cc@example.com', 'review-complete-template-id', 'CC')
+    checkNewClaimEmailSendAndEventRaised('willowfarm@gmail.com', 'review-complete-template-id', 'orgEmail')
+    checkNewClaimEmailSendAndEventRaised('john.doe@gmail.com', 'review-complete-template-id', 'email')
 
     expect(set).toHaveBeenCalledWith({
       agreementReference: 'IAHW-0AD3-3322',
@@ -130,7 +142,7 @@ describe('process evidence email message', () => {
     expect(getByClaimRefAndMessageType).toHaveBeenCalledWith('REBC-O9UD-22F6', 'claimCreated')
     expect(getLatestContactDetails).toHaveBeenCalledWith('IAHW-0AD3-3322', mockedLogger)
     expect(sendSFDEmail).toHaveBeenCalledTimes(1)
-    checkNewClaimEmailSendCalled('john.doe@gmail.com', 'review-complete-template-id')
+    checkNewClaimEmailSendAndEventRaised('john.doe@gmail.com', 'review-complete-template-id', 'email')
 
     expect(set).toHaveBeenCalledWith({
       agreementReference: 'IAHW-0AD3-3322',
@@ -169,8 +181,8 @@ describe('process evidence email message', () => {
     expect(getByClaimRefAndMessageType).toHaveBeenCalledWith('FUSH-O9UD-22F6', 'claimCreated')
     expect(getLatestContactDetails).toHaveBeenCalledWith('IAHW-0AD3-3322', mockedLogger)
     expect(sendSFDEmail).toHaveBeenCalledTimes(2)
-    checkNewClaimEmailSendCalled('cc@example.com', 'followup-complete-template-id', 'Sheep', 'Flock name', 'FUSH-O9UD-22F6')
-    checkNewClaimEmailSendCalled('willowfarm@gmail.com', 'followup-complete-template-id', 'Sheep', 'Flock name', 'FUSH-O9UD-22F6')
+    checkNewClaimEmailSendAndEventRaised('cc@example.com', 'followup-complete-template-id', 'CC', 'Sheep', 'Flock name', 'FUSH-O9UD-22F6')
+    checkNewClaimEmailSendAndEventRaised('willowfarm@gmail.com', 'followup-complete-template-id', 'orgEmail', 'Sheep', 'Flock name', 'FUSH-O9UD-22F6')
 
     expect(set).toHaveBeenCalledWith({
       agreementReference: 'IAHW-0AD3-3322',
@@ -215,5 +227,25 @@ describe('process evidence email message', () => {
     expect(getLatestContactDetails).toHaveBeenCalledTimes(0)
     expect(sendSFDEmail).toHaveBeenCalledTimes(0)
     expect(set).toHaveBeenCalledTimes(0)
+  })
+
+  test('should track an appInsights exception when email fails to send', async () => {
+    const error = new Error('Email send failed')
+    sendSFDEmail.mockImplementationOnce(() => { throw error })
+    const event = {
+      body: {
+        ...eventBody,
+      },
+      messageId: 1
+    }
+    getByClaimRefAndMessageType.mockResolvedValueOnce(null)
+    getLatestContactDetails.mockResolvedValueOnce({
+      name: 'Willow Farm',
+      orgEmail: 'willowfarm@gmail.com'
+    })
+
+    await expect(processNewClaimCreated(event, mockedLogger)).rejects.toThrow('Email send failed')
+
+    expect(appInsights.defaultClient.trackException).toHaveBeenCalledWith({ exception: error })
   })
 })
