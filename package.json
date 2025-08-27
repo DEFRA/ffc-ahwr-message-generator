@@ -24,12 +24,13 @@
     "@azure/identity": "^4.8.0",
     "@hapi/hapi": "21.4.0",
     "applicationinsights": "2.9.6",
+    "ffc-ahwr-common-library": "^2.3.0",
     "ffc-messaging": "^2.10.1",
     "hapi-pino": "12.1.0",
+    "http-status-codes": "^2.3.0",
     "joi": "17.13.3",
     "pg": "^8.14.1",
-    "sequelize": "^6.37.6",
-    "ffc-ahwr-common-library": "^2.3.0"
+    "sequelize": "^6.37.6"
   },
   "devDependencies": {
     "@babel/core": "^7.26.10",
