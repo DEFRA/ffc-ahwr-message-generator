@@ -1,10 +1,9 @@
-import { config as mockConfig, config } from '../../../../app/config/index.js'
+import { config } from '../../../../app/config/index.js'
 import { getByClaimRefAndMessageType, set } from '../../../../app/repositories/message-generate-repository.js'
 import { getLatestContactDetails } from '../../../../app/api/application-api.js'
 import { processNewClaimCreated } from '../../../../app/processing/new-claim-created-processor.js'
 import { sendSFDEmail } from '../../../../app/lib/sfd-client.js'
 import appInsights from 'applicationinsights'
-import { sendEvidenceEmail } from '../../../../app/email/evidence-email.js'
 
 jest.mock('../../../../app/repositories/message-generate-repository.js')
 jest.mock('../../../../app/api/application-api.js')
