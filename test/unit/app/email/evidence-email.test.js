@@ -255,7 +255,7 @@ describe('sendEvidenceEmail', () => {
     })
   })
 
-  test('should track an appInisghts exception when email fails to send', async () => {
+  test('should track an appInsights exception when email fails to send', async () => {
     const error = new Error('Email send failed')
     sendSFDEmail.mockImplementationOnce(() => { throw error })
     const params = {

@@ -43,9 +43,13 @@ container:
   evidenceEmailEnabled: false
   evidenceReviewTemplateId: be8fd7ee-4bcd-4bde-88a9-d9f238542723
   emailReplyToId: c3e9149b-9490-4321-808c-72e709d9d814
+  sfdEmailReplyToId: da1afd3e-3368-4c3e-b239-76676471c2d4
   evidenceFollowUpTemplateId: 21cc2409-f99a-4a3a-8a39-dd6a75c9b711
+  reviewCompleteTemplateId: 36ca11e8-3149-4bca-b924-7772c4f3b595
+  followupCompleteTemplateId: 9231bbc6-fe0b-4476-9d2b-0fd5cdb0f7a8
   applicationApiUri: https://ffc-ahwr-application.ffc-ahwr-snd2/api
   evidenceCarbonCopyEmailAddress: placeholder@example.com
+  carbonCopyEmailAddress: placeholder@example.com
 
 postgresService:
   postgresDb: ffc-ahwr-message-generator

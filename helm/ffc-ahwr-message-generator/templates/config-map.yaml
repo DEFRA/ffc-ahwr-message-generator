@@ -6,10 +6,14 @@ data:
   APPINSIGHTS_CLOUDROLE: {{ .Chart.Name | quote }}
   APPLICATION_API_URI: {{ quote .Values.container.applicationApiUri }}
   EVIDENCE_CARBON_COPY_EMAIL_ADDRESS: {{ quote .Values.container.evidenceCarbonCopyEmailAddress }}
+  CARBON_COPY_EMAIL_ADDRESS: {{ quote .Values.container.carbonCopyEmailAddress }}
   EVIDENCE_EMAIL_ENABLED: {{ quote .Values.container.evidenceEmailEnabled }}
   EVIDENCE_REVIEW_TEMPLATE_ID: {{ quote .Values.container.evidenceReviewTemplateId }}
   EMAIL_REPLY_TO_ID: {{ quote .Values.container.emailReplyToId }}
+  NO_REPLY_EMAIL_REPLY_TO_ID: {{ quote .Values.container.sfdEmailReplyToId }}
   EVIDENCE_FOLLOW_UP_TEMPLATE_ID: {{ quote .Values.container.evidenceFollowUpTemplateId }}
+  REVIEW_COMPLETE_TEMPLATE_ID: {{ quote .Values.container.reviewCompleteTemplateId }}
+  FOLLOW_UP_COMPLETE_TEMPLATE_ID: {{ quote .Values.container.followupCompleteTemplateId }}
   MESSAGE_QUEUE_HOST: {{ quote .Values.container.messageQueueHost }}
   MESSAGE_GENERATOR_QUEUE_ADDRESS: {{ quote .Values.container.messageGeneratorQueueAddress }}
   SFD_MESSAGE_QUEUE_ADDRESS: {{ quote .Values.container.sfdMessageQueueAddress }}

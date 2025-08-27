@@ -23,6 +23,11 @@ describe('validateStatusMessageRequest', () => {
     expect(mockSetBindingsLogger).toHaveBeenCalledTimes(0)
   })
 
+  test('returns true if the validation is successful, including optional amount', () => {
+    expect(validateStatusMessageRequest(mockedLogger, { ...validInputMessage, claimAmount: 456 })).toBeTruthy()
+    expect(mockSetBindingsLogger).toHaveBeenCalledTimes(0)
+  })
+
   describe('invalid input message produce validation error', () => {
     function expectFalseyResultAndValidationErrorSetInLogBinding (message) {
       expect(validateStatusMessageRequest(mockedLogger, message)).toBeFalsy()
@@ -77,6 +82,18 @@ describe('validateStatusMessageRequest', () => {
 
     test('returns false when validation fails due to missing herdName', () => {
       const invalidMessage = { ...validInputMessage, herdName: undefined }
+
+      expectFalseyResultAndValidationErrorSetInLogBinding(invalidMessage)
+    })
+
+    test('returns false when validation fails due to missing claimAmount, which is required when status is 5', () => {
+      const invalidMessage = { ...validInputMessage, claimStatus: 5 }
+
+      expectFalseyResultAndValidationErrorSetInLogBinding(invalidMessage)
+    })
+
+    test('returns false when validation fails due to missing claimAmount, which is required when status is 11', () => {
+      const invalidMessage = { ...validInputMessage, claimStatus: 11 }
 
       expectFalseyResultAndValidationErrorSetInLogBinding(invalidMessage)
     })

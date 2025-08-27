@@ -5,6 +5,7 @@ import { TYPE_OF_LIVESTOCK } from 'ffc-ahwr-common-library'
 import {
   REVIEW_CATTLE, FOLLOW_UP_CATTLE_POSITIVE, FOLLOW_UP_CATTLE_NEGATIVE_RECOMMENDED_PI_HUNT, FOLLOW_UP_CATTLE_NEGATIVE, FOLLOW_UP_PIGS, FOLLOW_UP_SHEEP, REVIEW_PIGS, REVIEW_SHEEP
 } from './bullet-points.js'
+import { getHerdNameLabel, LIVESTOCK_TO_READABLE_SPECIES } from '../constants.js'
 
 const { BEEF, DAIRY, PIGS, SHEEP } = TYPE_OF_LIVESTOCK
 
@@ -26,15 +27,6 @@ const getFollowUpBulletPoints = (typeOfLivestock, reviewTestResults, piHuntRecom
   if (typeOfLivestock === SHEEP) { return FOLLOW_UP_SHEEP }
 
   return []
-}
-
-const getHerdNameLabel = (typeOfLivestock) => typeOfLivestock === SHEEP ? 'Flock name' : 'Herd name'
-
-const LIVESTOCK_TO_READABLE_SPECIES = {
-  beef: 'Beef cattle',
-  dairy: 'Dairy cattle',
-  pigs: 'Pigs',
-  sheep: 'Sheep'
 }
 
 export const formatBullets = (bullets = []) => bullets.map((bullet) => `* ${bullet}`)
