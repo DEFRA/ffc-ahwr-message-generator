@@ -233,7 +233,7 @@ describe('process new claim email message', () => {
     sendSFDEmail.mockImplementationOnce(() => { throw error })
     const event = {
       body: {
-        ...eventBody,
+        ...eventBody
       },
       messageId: 1
     }
