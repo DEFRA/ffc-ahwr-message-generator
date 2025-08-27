@@ -1,5 +1,5 @@
 import { config } from '../config/index.js'
-import { getByClaimRefAndMessageType, set } from '../repositories/message-generate-repository.js'
+import { getByClaimRefAndMessageType, createMessageRequestEntry } from '../repositories/message-generate-repository.js'
 import { getLatestContactDetails } from '../api/application-api.js'
 import { sendEvidenceEmail } from '../email/evidence-email.js'
 import { AddressType } from '../constants.js'
@@ -43,7 +43,7 @@ export const processInCheckStatusMessageForEvidenceEmail = async (message, logge
       await sendEvidenceEmail({ ...requestParams, emailAddress: email, addressType: AddressType.EMAIL })
     }
 
-    await set({
+    await createMessageRequestEntry({
       agreementReference,
       claimReference,
       messageType,

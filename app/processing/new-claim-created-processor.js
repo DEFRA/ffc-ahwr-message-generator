@@ -1,5 +1,5 @@
 import { config } from '../config/index.js'
-import { getByClaimRefAndMessageType, set } from '../repositories/message-generate-repository.js'
+import { getByClaimRefAndMessageType, createMessageRequestEntry } from '../repositories/message-generate-repository.js'
 import { getLatestContactDetails } from '../api/application-api.js'
 import { AddressType, getHerdNameLabel, LIVESTOCK_TO_READABLE_SPECIES } from '../constants.js'
 import { sendSFDEmail } from '../lib/sfd-client.js'
@@ -44,7 +44,7 @@ export const processNewClaimCreated = async (message, logger) => {
       await sendClaimConfirmationEmail({ ...requestParams, emailAddress: email, addressType: AddressType.EMAIL })
     }
 
-    await set({
+    await createMessageRequestEntry({
       agreementReference,
       claimReference,
       messageType: MESSAGE_TYPE,

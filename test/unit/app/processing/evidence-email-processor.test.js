@@ -1,5 +1,5 @@
 import { config } from '../../../../app/config/index.js'
-import { getByClaimRefAndMessageType, set } from '../../../../app/repositories/message-generate-repository.js'
+import { getByClaimRefAndMessageType, createMessageRequestEntry } from '../../../../app/repositories/message-generate-repository.js'
 import { getLatestContactDetails } from '../../../../app/api/application-api.js'
 import { sendEvidenceEmail } from '../../../../app/email/evidence-email.js'
 import { processInCheckStatusMessageForEvidenceEmail } from '../../../../app/processing/evidence-email-processor.js'
@@ -82,7 +82,7 @@ describe('process evidence email message', () => {
     checkEvidenceEmailSendCalled('willowfarm@gmail.com', 'orgEmail')
     checkEvidenceEmailSendCalled('john.doe@gmail.com', 'email')
 
-    expect(set).toHaveBeenCalledWith({
+    expect(createMessageRequestEntry).toHaveBeenCalledWith({
       agreementReference: 'AHWR-0AD3-3322',
       claimReference: 'TEMP-O9UD-22F6',
       messageType: 'statusChange-5',
@@ -140,7 +140,7 @@ describe('process evidence email message', () => {
       typeOfLivestock: 'sheep',
       logger: mockedLogger
     })
-    expect(set).toHaveBeenCalledWith({
+    expect(createMessageRequestEntry).toHaveBeenCalledWith({
       agreementReference: 'AHWR-0AD3-3322',
       claimReference: 'TEMP-O9UD-22F6',
       messageType: 'statusChange-5',
@@ -199,7 +199,7 @@ describe('process evidence email message', () => {
       piHuntAllAnimals: undefined,
       herdName: undefined
     })
-    expect(set).toHaveBeenCalledWith({
+    expect(createMessageRequestEntry).toHaveBeenCalledWith({
       agreementReference: 'AHWR-0AD3-3322',
       claimReference: 'TEMP-O9UD-22F6',
       messageType: 'statusChange-5',
@@ -249,7 +249,7 @@ describe('process evidence email message', () => {
     expect(getByClaimRefAndMessageType).toHaveBeenCalledWith('TEMP-O9UD-22F6', 'statusChange-5')
     expect(getLatestContactDetails).toHaveBeenCalledTimes(0)
     expect(sendEvidenceEmail).toHaveBeenCalledTimes(0)
-    expect(set).toHaveBeenCalledTimes(0)
+    expect(createMessageRequestEntry).toHaveBeenCalledTimes(0)
   })
 
   test('should not send an evidence email when the evidence email feature flag is not enabled', async () => {
@@ -274,6 +274,6 @@ describe('process evidence email message', () => {
     expect(getByClaimRefAndMessageType).toHaveBeenCalledTimes(0)
     expect(getLatestContactDetails).toHaveBeenCalledTimes(0)
     expect(sendEvidenceEmail).toHaveBeenCalledTimes(0)
-    expect(set).toHaveBeenCalledTimes(0)
+    expect(createMessageRequestEntry).toHaveBeenCalledTimes(0)
   })
 })

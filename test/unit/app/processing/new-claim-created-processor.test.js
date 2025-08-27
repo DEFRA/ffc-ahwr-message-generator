@@ -1,5 +1,5 @@
 import { config } from '../../../../app/config/index.js'
-import { getByClaimRefAndMessageType, set } from '../../../../app/repositories/message-generate-repository.js'
+import { getByClaimRefAndMessageType, createMessageRequestEntry } from '../../../../app/repositories/message-generate-repository.js'
 import { getLatestContactDetails } from '../../../../app/api/application-api.js'
 import { processNewClaimCreated } from '../../../../app/processing/new-claim-created-processor.js'
 import { sendSFDEmail } from '../../../../app/lib/sfd-client.js'
@@ -105,7 +105,7 @@ describe('process new claim email message', () => {
     checkNewClaimEmailSendAndEventRaised('willowfarm@gmail.com', 'review-complete-template-id', 'orgEmail')
     checkNewClaimEmailSendAndEventRaised('john.doe@gmail.com', 'review-complete-template-id', 'email')
 
-    expect(set).toHaveBeenCalledWith({
+    expect(createMessageRequestEntry).toHaveBeenCalledWith({
       agreementReference: 'IAHW-0AD3-3322',
       claimReference: 'REBC-O9UD-22F6',
       messageType: 'claimCreated',
@@ -143,7 +143,7 @@ describe('process new claim email message', () => {
     expect(sendSFDEmail).toHaveBeenCalledTimes(1)
     checkNewClaimEmailSendAndEventRaised('john.doe@gmail.com', 'review-complete-template-id', 'email')
 
-    expect(set).toHaveBeenCalledWith({
+    expect(createMessageRequestEntry).toHaveBeenCalledWith({
       agreementReference: 'IAHW-0AD3-3322',
       claimReference: 'REBC-O9UD-22F6',
       messageType: 'claimCreated',
@@ -183,7 +183,7 @@ describe('process new claim email message', () => {
     checkNewClaimEmailSendAndEventRaised('cc@example.com', 'followup-complete-template-id', 'CC', 'Sheep', 'Flock name', 'FUSH-O9UD-22F6')
     checkNewClaimEmailSendAndEventRaised('willowfarm@gmail.com', 'followup-complete-template-id', 'orgEmail', 'Sheep', 'Flock name', 'FUSH-O9UD-22F6')
 
-    expect(set).toHaveBeenCalledWith({
+    expect(createMessageRequestEntry).toHaveBeenCalledWith({
       agreementReference: 'IAHW-0AD3-3322',
       claimReference: 'FUSH-O9UD-22F6',
       messageType: 'claimCreated',
@@ -225,7 +225,7 @@ describe('process new claim email message', () => {
     expect(getByClaimRefAndMessageType).toHaveBeenCalledWith('REBC-O9UD-22F6', 'claimCreated')
     expect(getLatestContactDetails).toHaveBeenCalledTimes(0)
     expect(sendSFDEmail).toHaveBeenCalledTimes(0)
-    expect(set).toHaveBeenCalledTimes(0)
+    expect(createMessageRequestEntry).toHaveBeenCalledTimes(0)
   })
 
   test('should track an appInsights exception when email fails to send', async () => {

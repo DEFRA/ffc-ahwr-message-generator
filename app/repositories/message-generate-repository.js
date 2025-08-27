@@ -2,7 +2,7 @@ import { REDACT_PII_VALUES } from 'ffc-ahwr-common-library'
 import dataModeller from '../data/index.js'
 import { Sequelize, Op } from 'sequelize'
 
-export const set = async (data) => {
+export const createMessageRequestEntry = async (data) => {
   const { models } = dataModeller
   await models.messageGenerate.create(data)
 }
