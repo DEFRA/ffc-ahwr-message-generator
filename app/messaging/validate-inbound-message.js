@@ -1,4 +1,5 @@
 import joi from 'joi'
+import { CLAIM_STATUS } from 'ffc-ahwr-common-library'
 
 const CRN_MIN_VALUE = 1050000000
 const CRN_MAX_VALUE = 9999999999
@@ -22,7 +23,7 @@ const inboundStatusMessageSchema = joi.object({
   piHuntRecommended: joi.string().optional(),
   piHuntAllAnimals: joi.string().optional(),
   herdName: joi.string().required(),
-  claimAmount: joi.number().optional()
+  claimAmount: joi.number().when('claimStatus', { is: [CLAIM_STATUS.IN_CHECK, CLAIM_STATUS.ON_HOLD], then: joi.required(), otherwise: joi.optional() })
 })
 
 export const validateStatusMessageRequest = (logger, event) => {
