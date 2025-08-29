@@ -5,8 +5,6 @@ services:
       target: production
     image: ffc-ahwr-message-generator
     container_name: ffc-ahwr-message-generator
-    depends_on:
-      - ffc-ahwr-message-generator-postgres
     environment:
       APPINSIGHTS_CLOUDROLE: ffc-ahwr-message-generator-local
       APPINSIGHTS_CONNECTIONSTRING: ${APPINSIGHTS_CONNECTIONSTRING}
@@ -31,15 +29,3 @@ services:
       POSTGRES_PORT: 5432
       POSTGRES_SCHEMA_NAME: ${POSTGRES_SCHEMA_NAME:-public}
       POSTGRES_USERNAME: ${POSTGRES_SCHEMA_USERNAME:-postgres}
-
-  ffc-ahwr-message-generator-postgres:
-    image: postgres:16.7-alpine
-    environment:
-      POSTGRES_DB: ffc-ahwr-message-generator
-      POSTGRES_PASSWORD: ppp
-      POSTGRES_USERNAME: postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data: {}

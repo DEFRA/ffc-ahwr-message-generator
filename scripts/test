@@ -70,14 +70,6 @@ compose() {
     npm run lint:fix
   fi
 
-  # Guarantee clean environment
-  compose down -v
-  $compose_cmd -f docker-compose.migrate.yaml -p "${service}-test" down -v
-
-  # Ensure container images are up to date
-  compose build
-  $compose_cmd -f docker-compose.migrate.yaml -p "${service}-test" run --rm database-up
-
   # Run tests
   if [ "${debug}" = "true" ]; then
     compose run --service-ports ${service} ${command}

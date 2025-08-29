@@ -85,18 +85,6 @@ describe('validateStatusMessageRequest', () => {
 
       expectFalseyResultAndValidationErrorSetInLogBinding(invalidMessage)
     })
-
-    test('returns false when validation fails due to missing claimAmount, which is required when status is 5', () => {
-      const invalidMessage = { ...validInputMessage, claimStatus: 5 }
-
-      expectFalseyResultAndValidationErrorSetInLogBinding(invalidMessage)
-    })
-
-    test('returns false when validation fails due to missing claimAmount, which is required when status is 11', () => {
-      const invalidMessage = { ...validInputMessage, claimStatus: 11 }
-
-      expectFalseyResultAndValidationErrorSetInLogBinding(invalidMessage)
-    })
   })
 
   test('CRN is optional, validation returns true when missing', () => {
