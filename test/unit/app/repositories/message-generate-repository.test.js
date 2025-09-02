@@ -82,7 +82,7 @@ describe('message generate repository', () => {
       const mockUpdatedRows = [{ id: 1 }, { id: 2 }]
       dataModeller.models.messageGenerate.update.mockResolvedValue([mockUpdatedRows.length, mockUpdatedRows])
 
-      await redactPII(agreementReference, mockLogger)
+      await redactPII(agreementReference, '102435055', mockLogger)
 
       expect(dataModeller.models.messageGenerate.update).toHaveBeenCalledWith(
         expect.objectContaining({ data: expect.any(Object) }),
@@ -120,14 +120,23 @@ describe('message generate repository', () => {
           }
         })
       )
-      expect(mockLogger.info).toHaveBeenCalledWith('Redacted 8 fields for agreementReference: AHWR-123')
+      expect(dataModeller.models.messageGenerate.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.any(Object) }),
+        expect.objectContaining({
+          where: {
+            agreementReference: 'AHWR-123',
+            [Op.and]: { val: "data->'sbi' IS NOT NULL" }
+          }
+        })
+      )
+      expect(mockLogger.info).toHaveBeenCalledWith('Redacted 10 fields for agreementReference: AHWR-123')
     })
 
     test('should log when no messages are updated', async () => {
       const agreementReference = 'AHWR-123'
       dataModeller.models.messageGenerate.update.mockResolvedValue([0, []])
 
-      await redactPII(agreementReference, mockLogger)
+      await redactPII(agreementReference, '102435055', mockLogger)
 
       expect(mockLogger.info).toHaveBeenCalledWith(
         `No fields redacted for agreementReference: ${agreementReference}`

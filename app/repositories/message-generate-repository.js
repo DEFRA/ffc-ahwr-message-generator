@@ -17,14 +17,15 @@ export const getByClaimRefAndMessageType = (claimReference, messageType) => {
   })
 }
 
-export const redactPII = async (agreementReference, logger) => {
+export const redactPII = async (agreementReference, redactedSbi, logger) => {
   const { models } = dataModeller
 
   const redactedValueByJSONPath = {
     email: REDACT_PII_VALUES.REDACTED_EMAIL,
     orgName: REDACT_PII_VALUES.REDACTED_ORGANISATION_NAME,
     orgEmail: REDACT_PII_VALUES.REDACTED_ORG_EMAIL,
-    herdName: REDACT_PII_VALUES.REDACTED_HERD_NAME
+    herdName: REDACT_PII_VALUES.REDACTED_HERD_NAME,
+    sbi: redactedSbi
   }
 
   let totalUpdates = 0
