@@ -10,7 +10,7 @@ export const redactPiiRequestHandlers = [
 
       await Promise.all(
         request.payload.agreementsToRedact.map(async (agreementToRedact) => {
-          await redactPII(agreementToRedact.reference, agreementToRedact.redactedSbi, request.logger)
+          await redactPII(agreementToRedact.reference, request.logger)
         }))
 
       return h.response().code(StatusCodes.OK)
