@@ -21,7 +21,7 @@
   ],
   "license": "OGL-UK-3.0",
   "dependencies": {
-    "@azure/identity": "^4.11.0",
+    "@azure/identity": "^4.11.2",
     "@hapi/hapi": "^21.4.2",
     "applicationinsights": "^2.9.7",
     "ffc-ahwr-common-library": "^2.4.0",
