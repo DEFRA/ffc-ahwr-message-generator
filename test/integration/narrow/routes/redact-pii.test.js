@@ -5,8 +5,8 @@ import HttpStatus from 'http-status-codes'
 jest.mock('../../../../app/repositories/message-generate-repository.js')
 
 const mockAgreementsToRedact = [
-  { reference: 'FAKE-REF-1', redactedSbi: '102435055' },
-  { reference: 'FAKE-REF-2', redactedSbi: '103935055' }
+  { reference: 'FAKE-REF-1' },
+  { reference: 'FAKE-REF-2' }
 ]
 
 describe('redact-pii', () => {
@@ -23,8 +23,8 @@ describe('redact-pii', () => {
       const res = await server.inject({ method: 'POST', url: '/api/redact/pii', payload: { agreementsToRedact: mockAgreementsToRedact } })
 
       expect(redactPII).toHaveBeenCalledTimes(2)
-      expect(redactPII).toHaveBeenCalledWith('FAKE-REF-1', '102435055', expect.any(Object))
-      expect(redactPII).toHaveBeenCalledWith('FAKE-REF-2', '103935055', expect.any(Object))
+      expect(redactPII).toHaveBeenCalledWith('FAKE-REF-1', expect.any(Object))
+      expect(redactPII).toHaveBeenCalledWith('FAKE-REF-2', expect.any(Object))
       expect(res.statusCode).toBe(HttpStatus.OK)
     })
   })
