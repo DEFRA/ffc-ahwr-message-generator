@@ -58,3 +58,14 @@ export const redactPII = async (agreementReference, logger) => {
     logger.info(`No fields redacted for agreementReference: ${agreementReference}`)
   }
 }
+
+export const isReminderEmailsFor = async (agreementReference, messageType) => {
+  const { models } = dataModeller
+  const messages = await models.messageGenerate.findAll({
+    where: {
+      agreementReference: agreementReference.toUpperCase(),
+      messageType
+    }
+  })
+  return messages.length > 0
+}

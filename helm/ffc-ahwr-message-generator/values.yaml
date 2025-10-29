@@ -50,6 +50,9 @@ container:
   applicationApiUri: https://ffc-ahwr-application.ffc-ahwr-snd2/api
   evidenceCarbonCopyEmailAddress: placeholder@example.com
   carbonCopyEmailAddress: placeholder@example.com
+  reminderEmailEnabled: false
+  reminderEmailNotClaimedTemplateId: ba2bfa67-6cc8-4536-990d-5333019ed710 # fake id
+
 
 postgresService:
   postgresDb: ffc-ahwr-message-generator

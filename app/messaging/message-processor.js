@@ -2,12 +2,17 @@ import { validateStatusMessageRequest } from './validate-inbound-message.js'
 import { CLAIM_STATUS } from 'ffc-ahwr-common-library'
 import { processInCheckStatusMessageForEvidenceEmail } from '../processing/evidence-email-processor.js'
 import { processNewClaimCreated } from '../processing/new-claim-created-processor.js'
+import { isReminderEmailMessage, processReminderEmailMessage } from '../processing/reminder-email-processor.js'
 
 export async function processMessage (logger, message, messageReceiver) {
   try {
     logger.info('Status update message received')
 
-    if (validateStatusMessageRequest(logger, message.body)) {
+    if(isReminderEmailMessage(message.body)) {
+      processReminderEmailMessage(message.body, logger)
+      await messageReceiver.completeMessage(message)
+
+    } else if (validateStatusMessageRequest(logger, message.body)) {
       const { claimReference, claimStatus } = message.body
       logger.setBindings({ claimReference, claimStatus })
 

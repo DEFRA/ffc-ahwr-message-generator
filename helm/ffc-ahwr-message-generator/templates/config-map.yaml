@@ -21,4 +21,6 @@ data:
   POSTGRES_HOST: {{ quote .Values.postgresService.postgresqlHost }}
   POSTGRES_PORT: {{ quote .Values.postgresService.postgresPort }}
   POSTGRES_SCHEMA_NAME: {{ quote .Values.postgresService.postgresSchema }}
+  REMINDER_EMAIL_ENABLED: {{ quote .Values.container.reminderEmailEnabled }}
+  REMINDER_EMAIL_NOT_CLAIMED: {{ quote .Values.container.reminderEmailNotClaimedTemplateId }}
 {{- end -}}
