@@ -8,10 +8,9 @@ export async function processMessage (logger, message, messageReceiver) {
   try {
     logger.info('Status update message received')
 
-    if(isReminderEmailMessage(message.body)) {
+    if (isReminderEmailMessage(message.body)) {
       processReminderEmailMessage(message.body, logger)
       await messageReceiver.completeMessage(message)
-
     } else if (validateStatusMessageRequest(logger, message.body)) {
       const { claimReference, claimStatus } = message.body
       logger.setBindings({ claimReference, claimStatus })

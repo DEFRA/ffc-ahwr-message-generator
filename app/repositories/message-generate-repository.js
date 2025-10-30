@@ -59,12 +59,18 @@ export const redactPII = async (agreementReference, logger) => {
   }
 }
 
-export const isReminderEmailsFor = async (agreementReference, messageType) => {
+export const isReminderEmailsFor = async (agreementReference, messageType, reminderType) => {
   const { models } = dataModeller
   const messages = await models.messageGenerate.findAll({
     where: {
       agreementReference: agreementReference.toUpperCase(),
-      messageType
+      messageType,
+      [Op.and]: [
+        Sequelize.where(
+          Sequelize.json('data.reminderType'),
+          reminderType
+        )
+      ]
     }
   })
   return messages.length > 0

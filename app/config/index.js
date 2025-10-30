@@ -22,7 +22,7 @@ export const getConfig = () => {
     reminderEmail: {
       enabled: joi.bool(),
       notClaimedTemplateId: joi.string().uuid()
-    },
+    }
   })
 
   const mainConfig = {
@@ -45,7 +45,7 @@ export const getConfig = () => {
     reminderEmail: {
       enabled: process.env.REMINDER_EMAIL_ENABLED === 'true',
       notClaimedTemplateId: process.env.REMINDER_EMAIL_NOT_CLAIMED
-    },
+    }
   }
 
   const { error } = schema.validate(mainConfig, {
