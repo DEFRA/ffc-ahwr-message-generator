@@ -2,6 +2,8 @@ import { config } from '../config/index.js'
 import { isReminderEmailsFor, createMessageRequestEntry } from '../repositories/message-generate-repository.js'
 import { sendSFDEmail } from '../lib/sfd-client.js'
 
+export const messageType = 'reminderEmail'
+
 export const isReminderEmailMessage = (message) => {
   return Boolean(message.reminderType)
 }
@@ -11,7 +13,6 @@ export const processReminderEmailMessage = async (message, logger) => {
   const emailReplyToId = config.emailReplyToId
   const notClaimedTemplateId = config.reminderEmail.notClaimedTemplateId
   const { reminderType, agreementReference, emailAddresses } = message
-  const messageType = 'reminderEmail'
 
   logger.setBindings({ reminderType, agreementReference, numEmailAddresses: emailAddresses.length })
 

@@ -1,6 +1,6 @@
-import { createMessageRequestEntry, getByClaimRefAndMessageType, redactPII } from '../../../../app/repositories/message-generate-repository.js'
+import { createMessageRequestEntry, getByClaimRefAndMessageType, redactPII, isReminderEmailsFor } from '../../../../app/repositories/message-generate-repository.js'
 import dataModeller from '../../../../app/data/index.js'
-import { Op } from 'sequelize'
+import { Sequelize, Op } from 'sequelize'
 
 jest.mock('../../../../app/data/index.js', () => {
   return {
@@ -8,7 +8,8 @@ jest.mock('../../../../app/data/index.js', () => {
       messageGenerate: {
         create: jest.fn(),
         findOne: jest.fn(),
-        update: jest.fn()
+        update: jest.fn(),
+        count: jest.fn()
       }
     }
   }
@@ -132,6 +133,50 @@ describe('message generate repository', () => {
       expect(mockLogger.info).toHaveBeenCalledWith(
         `No fields redacted for agreementReference: ${agreementReference}`
       )
+    })
+  })
+
+  describe('isReminderEmailsFor', () => {
+    test('return false when no records returned', async () => {
+      const agreementReference = 'IAHW-BEKR-AWIU'; const messageType = 'reminderEmail'; const reminderType = 'notClaimed_oneMonth'
+      dataModeller.models.messageGenerate.count.mockResolvedValueOnce(0)
+
+      const result = await isReminderEmailsFor(agreementReference, messageType, reminderType)
+
+      expect(dataModeller.models.messageGenerate.count).toHaveBeenCalledWith({
+        where: {
+          agreementReference,
+          messageType,
+          [Op.and]: [
+            Sequelize.where(
+              Sequelize.json('data.reminderType'),
+              reminderType
+            )
+          ]
+        }
+      })
+      expect(result).toBe(false)
+    })
+
+    test('return true when records returned', async () => {
+      const agreementReference = 'IAHW-BEKR-AWIU'; const messageType = 'reminderEmail'; const reminderType = 'notClaimed_oneMonth'
+      dataModeller.models.messageGenerate.count.mockResolvedValueOnce(1)
+
+      const result = await isReminderEmailsFor(agreementReference, messageType, reminderType)
+
+      expect(dataModeller.models.messageGenerate.count).toHaveBeenCalledWith({
+        where: {
+          agreementReference,
+          messageType,
+          [Op.and]: [
+            Sequelize.where(
+              Sequelize.json('data.reminderType'),
+              reminderType
+            )
+          ]
+        }
+      })
+      expect(result).toBe(true)
     })
   })
 })

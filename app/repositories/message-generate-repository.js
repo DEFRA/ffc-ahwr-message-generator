@@ -61,7 +61,8 @@ export const redactPII = async (agreementReference, logger) => {
 
 export const isReminderEmailsFor = async (agreementReference, messageType, reminderType) => {
   const { models } = dataModeller
-  const messages = await models.messageGenerate.findAll({
+
+  const count = await models.messageGenerate.count({
     where: {
       agreementReference: agreementReference.toUpperCase(),
       messageType,
@@ -73,5 +74,6 @@ export const isReminderEmailsFor = async (agreementReference, messageType, remin
       ]
     }
   })
-  return messages.length > 0
+
+  return count > 0
 }
