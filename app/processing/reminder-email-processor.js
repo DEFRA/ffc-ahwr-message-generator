@@ -7,7 +7,7 @@ import appInsights from 'applicationinsights'
 export const messageType = 'reminderEmail'
 
 export const isReminderEmailMessage = (messageProperties) => {
-  return Boolean(messageProperties?.type === messageType)
+  return Boolean(messageProperties.type === messageType)
 }
 
 export const processReminderEmailMessage = async (message, logger) => {
