@@ -1,6 +1,6 @@
 import { messageType, processReminderEmailMessage, isReminderEmailMessage } from '../../../../app/processing/reminder-email-processor.js'
 import { config } from '../../../../app/config/index.js'
-import { isReminderEmailsFor, createMessageRequestEntry } from '../../../../app/repositories/message-generate-repository.js'
+import { reminderEmailAlreadySent, createMessageRequestEntry } from '../../../../app/repositories/message-generate-repository.js'
 import { sendSFDEmail } from '../../../../app/lib/sfd-client.js'
 import appInsights from 'applicationinsights'
 
@@ -12,7 +12,7 @@ jest.mock('../../../../app/config/index.js', () => ({
       enabled: true,
       notClaimedTemplateId: 'ba2bfa67-6cc8-4536-990d-5333019ed710' // fake id
     },
-    emailReplyToId: 'ba2bfa67-6cc8-4536-990d-5333019ed711' // fake id
+    noReplyEmailReplyToId: 'ba2bfa67-6cc8-4536-990d-5333019ed711' // fake id
   }
 }))
 jest.mock('applicationinsights', () => ({
@@ -30,7 +30,7 @@ const mockedLogger = {
 
 describe('isReminderEmailMessage', () => {
   test('return true when message contains reminderType', async () => {
-    expect(isReminderEmailMessage({ reminderType: 'foo' })).toBe(true)
+    expect(isReminderEmailMessage({ type: 'reminderEmail' })).toBe(true)
   })
   test('return false when message does not contain reminderType', async () => {
     expect(isReminderEmailMessage({})).toBe(false)
@@ -41,7 +41,7 @@ describe('processReminderEmailMessage', () => {
   afterEach(() => {
     jest.resetAllMocks()
     config.reminderEmail.enabled = true
-    isReminderEmailsFor.mockResolvedValue(false)
+    reminderEmailAlreadySent.mockResolvedValue(false)
     sendSFDEmail.mockReset()
   })
 
@@ -61,7 +61,7 @@ describe('processReminderEmailMessage', () => {
     expect(mockedLogger.setBindings).toHaveBeenCalledTimes(1)
     expect(mockedLogger.info).toHaveBeenCalledTimes(1)
     expect(mockedLogger.info).toHaveBeenCalledWith('Skipping sending reminder email, feature flag is not enabled')
-    expect(isReminderEmailsFor).toHaveBeenCalledTimes(0)
+    expect(reminderEmailAlreadySent).toHaveBeenCalledTimes(0)
     expect(sendSFDEmail).toHaveBeenCalledTimes(0)
     expect(createMessageRequestEntry).toHaveBeenCalledTimes(0)
   })
@@ -80,7 +80,7 @@ describe('processReminderEmailMessage', () => {
     expect(mockedLogger.setBindings).toHaveBeenCalledTimes(1)
     expect(mockedLogger.info).toHaveBeenCalledTimes(1)
     expect(mockedLogger.info).toHaveBeenCalledWith('Skipping sending reminder email, unrecognised reminder parent/sub type provided')
-    expect(isReminderEmailsFor).toHaveBeenCalledTimes(0)
+    expect(reminderEmailAlreadySent).toHaveBeenCalledTimes(0)
     expect(sendSFDEmail).toHaveBeenCalledTimes(0)
     expect(createMessageRequestEntry).toHaveBeenCalledTimes(0)
   })
@@ -93,15 +93,15 @@ describe('processReminderEmailMessage', () => {
       sbi: '106282723',
       emailAddresses: ['fake-email@example.com']
     }
-    isReminderEmailsFor.mockResolvedValueOnce(true)
+    reminderEmailAlreadySent.mockResolvedValueOnce(true)
 
     await processReminderEmailMessage(message, mockedLogger)
 
     expect(mockedLogger.setBindings).toHaveBeenCalledTimes(1)
     expect(mockedLogger.info).toHaveBeenCalledTimes(1)
     expect(mockedLogger.info).toHaveBeenCalledWith('Skipping sending reminder email, already been processed')
-    expect(isReminderEmailsFor).toHaveBeenCalledTimes(1)
-    expect(isReminderEmailsFor).toHaveBeenCalledWith(message.agreementReference, messageType, message.reminderType)
+    expect(reminderEmailAlreadySent).toHaveBeenCalledTimes(1)
+    expect(reminderEmailAlreadySent).toHaveBeenCalledWith(message.agreementReference, messageType, message.reminderType)
     expect(sendSFDEmail).toHaveBeenCalledTimes(0)
     expect(createMessageRequestEntry).toHaveBeenCalledTimes(0)
   })
@@ -121,8 +121,8 @@ describe('processReminderEmailMessage', () => {
     expect(mockedLogger.info).toHaveBeenCalledTimes(3)
     expect(mockedLogger.info).toHaveBeenCalledWith('Processing reminder email message')
     expect(mockedLogger.info).toHaveBeenCalledWith('Sent reminder email')
-    expect(isReminderEmailsFor).toHaveBeenCalledTimes(1)
-    expect(isReminderEmailsFor).toHaveBeenCalledWith(message.agreementReference, messageType, message.reminderType)
+    expect(reminderEmailAlreadySent).toHaveBeenCalledTimes(1)
+    expect(reminderEmailAlreadySent).toHaveBeenCalledWith(message.agreementReference, messageType, message.reminderType)
     expect(sendSFDEmail).toHaveBeenCalledTimes(2)
     expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledTimes(2)
     expect(createMessageRequestEntry).toHaveBeenCalledTimes(2)
@@ -179,7 +179,7 @@ describe('processReminderEmailMessage', () => {
       expect(mockedLogger.info).toHaveBeenCalledWith('Processing reminder email message')
       expect(mockedLogger.error).toHaveBeenCalledTimes(1)
       expect(mockedLogger.error).toHaveBeenCalledWith(expect.any(Error), 'Failed to send reminder email')
-      expect(isReminderEmailsFor).toHaveBeenCalledTimes(1)
+      expect(reminderEmailAlreadySent).toHaveBeenCalledTimes(1)
       expect(sendSFDEmail).toHaveBeenCalledTimes(1)
       expect(appInsights.defaultClient.trackException).toHaveBeenCalledTimes(1)
       expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledTimes(0)

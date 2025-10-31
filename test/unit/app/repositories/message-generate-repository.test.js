@@ -1,4 +1,4 @@
-import { createMessageRequestEntry, getByClaimRefAndMessageType, redactPII, isReminderEmailsFor } from '../../../../app/repositories/message-generate-repository.js'
+import { createMessageRequestEntry, getByClaimRefAndMessageType, redactPII, reminderEmailAlreadySent } from '../../../../app/repositories/message-generate-repository.js'
 import dataModeller from '../../../../app/data/index.js'
 import { Sequelize, Op } from 'sequelize'
 
@@ -136,12 +136,12 @@ describe('message generate repository', () => {
     })
   })
 
-  describe('isReminderEmailsFor', () => {
+  describe('reminderEmailAlreadySent', () => {
     test('return false when no records returned', async () => {
       const agreementReference = 'IAHW-BEKR-AWIU'; const messageType = 'reminderEmail'; const reminderType = 'notClaimed_oneMonth'
       dataModeller.models.messageGenerate.count.mockResolvedValueOnce(0)
 
-      const result = await isReminderEmailsFor(agreementReference, messageType, reminderType)
+      const result = await reminderEmailAlreadySent(agreementReference, messageType, reminderType)
 
       expect(dataModeller.models.messageGenerate.count).toHaveBeenCalledWith({
         where: {
@@ -162,7 +162,7 @@ describe('message generate repository', () => {
       const agreementReference = 'IAHW-BEKR-AWIU'; const messageType = 'reminderEmail'; const reminderType = 'notClaimed_oneMonth'
       dataModeller.models.messageGenerate.count.mockResolvedValueOnce(1)
 
-      const result = await isReminderEmailsFor(agreementReference, messageType, reminderType)
+      const result = await reminderEmailAlreadySent(agreementReference, messageType, reminderType)
 
       expect(dataModeller.models.messageGenerate.count).toHaveBeenCalledWith({
         where: {

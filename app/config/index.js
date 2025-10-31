@@ -44,7 +44,7 @@ export const getConfig = () => {
     sfdRequestMsgType: 'uk.gov.ffc.ahwr.sfd.request',
     reminderEmail: {
       enabled: process.env.REMINDER_EMAIL_ENABLED === 'true',
-      notClaimedTemplateId: process.env.REMINDER_EMAIL_NOT_CLAIMED
+      notClaimedTemplateId: process.env.REMINDER_EMAIL_NOT_CLAIMED_TEMPLATE_ID
     }
   }
 

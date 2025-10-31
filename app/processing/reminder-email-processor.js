@@ -1,13 +1,13 @@
 import { config } from '../config/index.js'
 import { isValidReminderType } from 'ffc-ahwr-common-library'
-import { isReminderEmailsFor, createMessageRequestEntry } from '../repositories/message-generate-repository.js'
+import { reminderEmailAlreadySent, createMessageRequestEntry } from '../repositories/message-generate-repository.js'
 import { sendSFDEmail } from '../lib/sfd-client.js'
 import appInsights from 'applicationinsights'
 
 export const messageType = 'reminderEmail'
 
-export const isReminderEmailMessage = (message) => {
-  return Boolean(message.reminderType)
+export const isReminderEmailMessage = (messageProperties) => {
+  return Boolean(messageProperties?.type === messageType)
 }
 
 export const processReminderEmailMessage = async (message, logger) => {
@@ -26,7 +26,7 @@ export const processReminderEmailMessage = async (message, logger) => {
     return
   }
 
-  if (await isReminderEmailsFor(agreementReference, messageType, reminderType)) {
+  if (await reminderEmailAlreadySent(agreementReference, messageType, reminderType)) {
     logger.info('Skipping sending reminder email, already been processed')
     return
   }
@@ -40,7 +40,7 @@ export const processReminderEmailMessage = async (message, logger) => {
 }
 
 const createSfdMessages = ({ emailAddresses, reminderType, agreementReference, crn, sbi }) => {
-  const emailReplyToId = config.emailReplyToId
+  const emailReplyToId = config.noReplyEmailReplyToId
   // Add template by reminderType when required
   const notifyTemplateId = config.reminderEmail.notClaimedTemplateId
   const customParams = { agreementReference }

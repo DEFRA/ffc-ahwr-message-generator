@@ -59,7 +59,7 @@ export const redactPII = async (agreementReference, logger) => {
   }
 }
 
-export const isReminderEmailsFor = async (agreementReference, messageType, reminderType) => {
+export const reminderEmailAlreadySent = async (agreementReference, messageType, reminderType) => {
   const { models } = dataModeller
 
   const count = await models.messageGenerate.count({
