@@ -35,7 +35,7 @@ export const processReminderEmailMessage = async (message, logger) => {
   const messages = createSfdMessages(message)
   for (const message of messages) {
     await sendMessageToSfdProxy(message, logger)
-    await storeMessageInDatabase(message, messageType, reminderType)
+    await storeMessageInDatabase(message)
   }
 }
 
@@ -71,7 +71,7 @@ const sendMessageToSfdProxy = async ({ agreementReference, crn, sbi, emailAddres
   }
 }
 
-const storeMessageInDatabase = async (message, messageType, reminderType) => {
+const storeMessageInDatabase = async (message) => {
   const { agreementReference } = message
-  await createMessageRequestEntry({ agreementReference, messageType, data: { ...message, reminderType } })
+  await createMessageRequestEntry({ agreementReference, messageType, data: { ...message } })
 }
