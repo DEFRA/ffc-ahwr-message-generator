@@ -1,7 +1,8 @@
-import { messageType, processReminderEmailMessage } from '../../../../app/processing/reminder-email-processor.js'
+import { messageType, processReminderEmailMessage, isReminderEmailMessage } from '../../../../app/processing/reminder-email-processor.js'
 import { config } from '../../../../app/config/index.js'
 import { isReminderEmailsFor, createMessageRequestEntry } from '../../../../app/repositories/message-generate-repository.js'
 import { sendSFDEmail } from '../../../../app/lib/sfd-client.js'
+import appInsights from 'applicationinsights'
 
 jest.mock('../../../../app/repositories/message-generate-repository.js')
 jest.mock('../../../../app/lib/sfd-client.js')
@@ -10,7 +11,14 @@ jest.mock('../../../../app/config/index.js', () => ({
     reminderEmail: {
       enabled: true,
       notClaimedTemplateId: 'ba2bfa67-6cc8-4536-990d-5333019ed710' // fake id
-    }
+    },
+    emailReplyToId: 'ba2bfa67-6cc8-4536-990d-5333019ed711' // fake id
+  }
+}))
+jest.mock('applicationinsights', () => ({
+  defaultClient: {
+    trackEvent: jest.fn(),
+    trackException: jest.fn()
   }
 }))
 
@@ -20,16 +28,26 @@ const mockedLogger = {
   error: jest.fn()
 }
 
-describe('process reminder email message', () => {
+describe('isReminderEmailMessage', () => {
+  test('return true when message contains reminderType', async () => {
+    expect(isReminderEmailMessage({ reminderType: 'foo' })).toBe(true)
+  })
+  test('return false when message does not contain reminderType', async () => {
+    expect(isReminderEmailMessage({})).toBe(false)
+  })
+})
+
+describe('processReminderEmailMessage', () => {
   afterEach(() => {
     jest.resetAllMocks()
     config.reminderEmail.enabled = true
     isReminderEmailsFor.mockResolvedValue(false)
+    sendSFDEmail.mockReset()
   })
 
   test('when toggled off, processing skipped and message logged', async () => {
     const event = {
-      reminderType: 'fake-reminder-type',
+      reminderType: 'notClaimed_threeMonths',
       agreementReference: 'IAHW-BEKR-AWIU',
       crn: '1100407200',
       sbi: '106282723',
@@ -48,9 +66,28 @@ describe('process reminder email message', () => {
     expect(createMessageRequestEntry).toHaveBeenCalledTimes(0)
   })
 
+  test('when reminder message contains invalid reminder parent/sub type, processing skipped and message logged', async () => {
+    const event = {
+      reminderType: 'notClaimed_invalidSubType',
+      agreementReference: 'IAHW-BEKR-AWIU',
+      crn: '1100407200',
+      sbi: '106282723',
+      emailAddresses: ['fake-email@example.com']
+    }
+
+    await processReminderEmailMessage(event, mockedLogger)
+
+    expect(mockedLogger.setBindings).toHaveBeenCalledTimes(1)
+    expect(mockedLogger.info).toHaveBeenCalledTimes(1)
+    expect(mockedLogger.info).toHaveBeenCalledWith('Skipping sending reminder email, unrecognised reminder parent/sub type provided')
+    expect(isReminderEmailsFor).toHaveBeenCalledTimes(0)
+    expect(sendSFDEmail).toHaveBeenCalledTimes(0)
+    expect(createMessageRequestEntry).toHaveBeenCalledTimes(0)
+  })
+
   test('when reminder emails already exists, processing skipped and message logged', async () => {
     const message = {
-      reminderType: 'fake-reminder-type',
+      reminderType: 'notClaimed_threeMonths',
       agreementReference: 'IAHW-BEKR-AWIU',
       crn: '1100407200',
       sbi: '106282723',
@@ -71,7 +108,7 @@ describe('process reminder email message', () => {
 
   test('request sent to messaging proxy and stored in database for each email provided', async () => {
     const message = {
-      reminderType: 'fake-reminder-type',
+      reminderType: 'notClaimed_threeMonths',
       agreementReference: 'IAHW-BEKR-AWIU',
       crn: '1100407200',
       sbi: '106282723',
@@ -87,6 +124,7 @@ describe('process reminder email message', () => {
     expect(isReminderEmailsFor).toHaveBeenCalledTimes(1)
     expect(isReminderEmailsFor).toHaveBeenCalledWith(message.agreementReference, messageType, message.reminderType)
     expect(sendSFDEmail).toHaveBeenCalledTimes(2)
+    expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledTimes(2)
     expect(createMessageRequestEntry).toHaveBeenCalledTimes(2)
     expect(createMessageRequestEntry).toHaveBeenCalledWith({
       agreementReference: 'IAHW-BEKR-AWIU',
@@ -95,7 +133,12 @@ describe('process reminder email message', () => {
         crn: '1100407200',
         sbi: '106282723',
         emailAddress: 'fake-email-1@example.com',
-        reminderType: 'fake-reminder-type'
+        reminderType: 'notClaimed_threeMonths',
+        customParams: {
+          agreementReference: 'IAHW-BEKR-AWIU'
+        },
+        emailReplyToId: 'ba2bfa67-6cc8-4536-990d-5333019ed711',
+        notifyTemplateId: 'ba2bfa67-6cc8-4536-990d-5333019ed710'
       },
       messageType: 'reminderEmail'
     })
@@ -106,9 +149,41 @@ describe('process reminder email message', () => {
         crn: '1100407200',
         sbi: '106282723',
         emailAddress: 'fake-email-2@example.com',
-        reminderType: 'fake-reminder-type'
+        reminderType: 'notClaimed_threeMonths',
+        customParams: {
+          agreementReference: 'IAHW-BEKR-AWIU'
+        },
+        emailReplyToId: 'ba2bfa67-6cc8-4536-990d-5333019ed711',
+        notifyTemplateId: 'ba2bfa67-6cc8-4536-990d-5333019ed710'
       },
       messageType: 'reminderEmail'
     })
+  })
+
+  test('exception thrown when comms with messaging proxy fail and nothing is stored in database to allow retry', async () => {
+    const message = {
+      reminderType: 'notClaimed_threeMonths',
+      agreementReference: 'IAHW-BEKR-AWIU',
+      crn: '1100407200',
+      sbi: '106282723',
+      emailAddresses: ['fake-email-1@example.com']
+    }
+
+    sendSFDEmail.mockRejectedValueOnce(new Error('Fake failed comms'))
+
+    try {
+      await processReminderEmailMessage(message, mockedLogger)
+    } catch (e) {
+      expect(mockedLogger.setBindings).toHaveBeenCalledTimes(1)
+      expect(mockedLogger.info).toHaveBeenCalledTimes(1)
+      expect(mockedLogger.info).toHaveBeenCalledWith('Processing reminder email message')
+      expect(mockedLogger.error).toHaveBeenCalledTimes(1)
+      expect(mockedLogger.error).toHaveBeenCalledWith(expect.any(Error), 'Failed to send reminder email')
+      expect(isReminderEmailsFor).toHaveBeenCalledTimes(1)
+      expect(sendSFDEmail).toHaveBeenCalledTimes(1)
+      expect(appInsights.defaultClient.trackException).toHaveBeenCalledTimes(1)
+      expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledTimes(0)
+      expect(createMessageRequestEntry).toHaveBeenCalledTimes(0)
+    }
   })
 })
