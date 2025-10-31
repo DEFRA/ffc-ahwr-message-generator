@@ -32,10 +32,10 @@ export const processReminderEmailMessage = async (message, logger) => {
   }
 
   logger.info('Processing reminder email message')
-  const messages = createSfdMessages(message)
-  for (const message of messages) {
-    await sendMessageToSfdProxy(message, logger)
-    await storeMessageInDatabase(message)
+  const messagesForSFD = createSfdMessages(message)
+  for (const sfdMessage of messagesForSFD) {
+    await sendMessageToSfdProxy(sfdMessage, logger)
+    await storeMessageInDatabase(sfdMessage)
   }
 }
 
