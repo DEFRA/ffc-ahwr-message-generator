@@ -58,3 +58,22 @@ export const redactPII = async (agreementReference, logger) => {
     logger.info(`No fields redacted for agreementReference: ${agreementReference}`)
   }
 }
+
+export const reminderEmailAlreadySent = async (agreementReference, messageType, reminderType) => {
+  const { models } = dataModeller
+
+  const count = await models.messageGenerate.count({
+    where: {
+      agreementReference: agreementReference.toUpperCase(),
+      messageType,
+      [Op.and]: [
+        Sequelize.where(
+          Sequelize.json('data.reminderType'),
+          reminderType
+        )
+      ]
+    }
+  })
+
+  return count > 0
+}

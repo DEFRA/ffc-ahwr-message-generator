@@ -2,10 +2,12 @@ import { processMessage } from '../../../../app/messaging/message-processor.js'
 import { validateStatusMessageRequest } from '../../../../app/messaging/validate-inbound-message.js'
 import { processInCheckStatusMessageForEvidenceEmail } from '../../../../app/processing/evidence-email-processor.js'
 import { processNewClaimCreated } from '../../../../app/processing/new-claim-created-processor.js'
+import { isReminderEmailMessage, processReminderEmailMessage } from '../../../../app/processing/reminder-email-processor.js'
 
 jest.mock('../../../../app/messaging/validate-inbound-message')
 jest.mock('../../../../app/processing/evidence-email-processor.js')
 jest.mock('../../../../app/processing/new-claim-created-processor.js')
+jest.mock('../../../../app/processing/reminder-email-processor.js')
 
 const mockedLogger = {
   info: jest.fn(),
@@ -83,6 +85,23 @@ describe('process Message', () => {
     expect(validateStatusMessageRequest).toHaveBeenCalledTimes(1)
     expect(processNewClaimCreated).toHaveBeenCalledTimes(0)
     expect(processInCheckStatusMessageForEvidenceEmail).toHaveBeenCalledTimes(0)
+    expect(mockCompleteMessage).toHaveBeenCalledTimes(1)
+    expect(mockedLogger.info).toHaveBeenCalledTimes(1)
+  })
+
+  test('reminder email processed when isReminderEmailMessage is true', async () => {
+    const event = {
+      body: {
+        reminderType: 'fake-reminder-type'
+      },
+      messageId: 1
+    }
+    isReminderEmailMessage.mockReturnValueOnce(true)
+
+    await processMessage(mockedLogger, event, mockMessageReceiver)
+
+    expect(processReminderEmailMessage).toHaveBeenCalledTimes(1)
+    expect(validateStatusMessageRequest).toHaveBeenCalledTimes(0)
     expect(mockCompleteMessage).toHaveBeenCalledTimes(1)
     expect(mockedLogger.info).toHaveBeenCalledTimes(1)
   })

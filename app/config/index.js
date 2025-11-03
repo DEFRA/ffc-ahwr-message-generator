@@ -18,7 +18,11 @@ export const getConfig = () => {
     evidenceFollowUpTemplateId: joi.string().uuid(),
     reviewCompleteTemplateId: joi.string().uuid(),
     followupCompleteTemplateId: joi.string().uuid(),
-    sfdRequestMsgType: joi.string()
+    sfdRequestMsgType: joi.string(),
+    reminderEmail: {
+      enabled: joi.bool(),
+      notClaimedTemplateId: joi.string().uuid()
+    }
   })
 
   const mainConfig = {
@@ -37,7 +41,11 @@ export const getConfig = () => {
     evidenceFollowUpTemplateId: process.env.EVIDENCE_FOLLOW_UP_TEMPLATE_ID,
     reviewCompleteTemplateId: process.env.REVIEW_COMPLETE_TEMPLATE_ID,
     followupCompleteTemplateId: process.env.FOLLOW_UP_COMPLETE_TEMPLATE_ID,
-    sfdRequestMsgType: 'uk.gov.ffc.ahwr.sfd.request'
+    sfdRequestMsgType: 'uk.gov.ffc.ahwr.sfd.request',
+    reminderEmail: {
+      enabled: process.env.REMINDER_EMAIL_ENABLED === 'true',
+      notClaimedTemplateId: process.env.REMINDER_EMAIL_NOT_CLAIMED_TEMPLATE_ID
+    }
   }
 
   const { error } = schema.validate(mainConfig, {
