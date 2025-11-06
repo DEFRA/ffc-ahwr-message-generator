@@ -4,7 +4,7 @@ import { reminderEmailAlreadySent, createMessageRequestEntry } from '../reposito
 import { sendSFDEmail } from '../lib/sfd-client.js'
 import appInsights from 'applicationinsights'
 
-export const messageType = 'reminderEmail'
+export const messageType = 'uk.gov.ffc.ahwr.agreement.reminder.email'
 
 export const isReminderEmailMessage = (messageProperties) => {
   return Boolean(messageProperties.type === messageType)

@@ -30,7 +30,7 @@ const mockedLogger = {
 
 describe('isReminderEmailMessage', () => {
   test('return true when message contains reminderType', async () => {
-    expect(isReminderEmailMessage({ type: 'reminderEmail' })).toBe(true)
+    expect(isReminderEmailMessage({ type: 'uk.gov.ffc.ahwr.agreement.reminder.email' })).toBe(true)
   })
   test('return false when message does not contain reminderType', async () => {
     expect(isReminderEmailMessage({})).toBe(false)
@@ -140,7 +140,7 @@ describe('processReminderEmailMessage', () => {
         emailReplyToId: 'ba2bfa67-6cc8-4536-990d-5333019ed711',
         notifyTemplateId: 'ba2bfa67-6cc8-4536-990d-5333019ed710'
       },
-      messageType: 'reminderEmail'
+      messageType: 'uk.gov.ffc.ahwr.agreement.reminder.email'
     })
     expect(createMessageRequestEntry).toHaveBeenCalledWith({
       agreementReference: 'IAHW-BEKR-AWIU',
@@ -156,7 +156,7 @@ describe('processReminderEmailMessage', () => {
         emailReplyToId: 'ba2bfa67-6cc8-4536-990d-5333019ed711',
         notifyTemplateId: 'ba2bfa67-6cc8-4536-990d-5333019ed710'
       },
-      messageType: 'reminderEmail'
+      messageType: 'uk.gov.ffc.ahwr.agreement.reminder.email'
     })
   })
 

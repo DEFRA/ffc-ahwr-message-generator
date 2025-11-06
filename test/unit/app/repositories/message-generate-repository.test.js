@@ -138,7 +138,7 @@ describe('message generate repository', () => {
 
   describe('reminderEmailAlreadySent', () => {
     test('return false when no records returned', async () => {
-      const agreementReference = 'IAHW-BEKR-AWIU'; const messageType = 'reminderEmail'; const reminderType = 'notClaimed_oneMonth'
+      const agreementReference = 'IAHW-BEKR-AWIU'; const messageType = 'uk.gov.ffc.ahwr.agreement.reminder.email'; const reminderType = 'notClaimed_oneMonth'
       dataModeller.models.messageGenerate.count.mockResolvedValueOnce(0)
 
       const result = await reminderEmailAlreadySent(agreementReference, messageType, reminderType)
@@ -159,7 +159,7 @@ describe('message generate repository', () => {
     })
 
     test('return true when records returned', async () => {
-      const agreementReference = 'IAHW-BEKR-AWIU'; const messageType = 'reminderEmail'; const reminderType = 'notClaimed_oneMonth'
+      const agreementReference = 'IAHW-BEKR-AWIU'; const messageType = 'uk.gov.ffc.ahwr.agreement.reminder.email'; const reminderType = 'notClaimed_oneMonth'
       dataModeller.models.messageGenerate.count.mockResolvedValueOnce(1)
 
       const result = await reminderEmailAlreadySent(agreementReference, messageType, reminderType)
