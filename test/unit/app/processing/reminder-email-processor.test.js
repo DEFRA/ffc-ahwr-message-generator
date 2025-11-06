@@ -1,4 +1,4 @@
-import { messageType, processReminderEmailMessage, isReminderEmailMessage } from '../../../../app/processing/reminder-email-processor.js'
+import { inboundMessageType, databaseMessageType, processReminderEmailMessage, isReminderEmailMessage } from '../../../../app/processing/reminder-email-processor.js'
 import { config } from '../../../../app/config/index.js'
 import { reminderEmailAlreadySent, createMessageRequestEntry } from '../../../../app/repositories/message-generate-repository.js'
 import { sendSFDEmail } from '../../../../app/lib/sfd-client.js'
@@ -30,7 +30,7 @@ const mockedLogger = {
 
 describe('isReminderEmailMessage', () => {
   test('return true when message contains reminderType', async () => {
-    expect(isReminderEmailMessage({ type: 'uk.gov.ffc.ahwr.agreement.reminder.email' })).toBe(true)
+    expect(isReminderEmailMessage({ type: inboundMessageType })).toBe(true)
   })
   test('return false when message does not contain reminderType', async () => {
     expect(isReminderEmailMessage({})).toBe(false)
@@ -101,7 +101,7 @@ describe('processReminderEmailMessage', () => {
     expect(mockedLogger.info).toHaveBeenCalledTimes(1)
     expect(mockedLogger.info).toHaveBeenCalledWith('Skipping sending reminder email, already been processed')
     expect(reminderEmailAlreadySent).toHaveBeenCalledTimes(1)
-    expect(reminderEmailAlreadySent).toHaveBeenCalledWith(message.agreementReference, messageType, message.reminderType)
+    expect(reminderEmailAlreadySent).toHaveBeenCalledWith(message.agreementReference, databaseMessageType, message.reminderType)
     expect(sendSFDEmail).toHaveBeenCalledTimes(0)
     expect(createMessageRequestEntry).toHaveBeenCalledTimes(0)
   })
@@ -122,7 +122,7 @@ describe('processReminderEmailMessage', () => {
     expect(mockedLogger.info).toHaveBeenCalledWith('Processing reminder email message')
     expect(mockedLogger.info).toHaveBeenCalledWith('Sent reminder email')
     expect(reminderEmailAlreadySent).toHaveBeenCalledTimes(1)
-    expect(reminderEmailAlreadySent).toHaveBeenCalledWith(message.agreementReference, messageType, message.reminderType)
+    expect(reminderEmailAlreadySent).toHaveBeenCalledWith(message.agreementReference, databaseMessageType, message.reminderType)
     expect(sendSFDEmail).toHaveBeenCalledTimes(2)
     expect(appInsights.defaultClient.trackEvent).toHaveBeenCalledTimes(2)
     expect(createMessageRequestEntry).toHaveBeenCalledTimes(2)
@@ -140,7 +140,7 @@ describe('processReminderEmailMessage', () => {
         emailReplyToId: 'ba2bfa67-6cc8-4536-990d-5333019ed711',
         notifyTemplateId: 'ba2bfa67-6cc8-4536-990d-5333019ed710'
       },
-      messageType: 'uk.gov.ffc.ahwr.agreement.reminder.email'
+      messageType: databaseMessageType
     })
     expect(createMessageRequestEntry).toHaveBeenCalledWith({
       agreementReference: 'IAHW-BEKR-AWIU',
@@ -156,7 +156,7 @@ describe('processReminderEmailMessage', () => {
         emailReplyToId: 'ba2bfa67-6cc8-4536-990d-5333019ed711',
         notifyTemplateId: 'ba2bfa67-6cc8-4536-990d-5333019ed710'
       },
-      messageType: 'uk.gov.ffc.ahwr.agreement.reminder.email'
+      messageType: databaseMessageType
     })
   })
 
