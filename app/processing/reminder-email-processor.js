@@ -4,10 +4,11 @@ import { reminderEmailAlreadySent, createMessageRequestEntry } from '../reposito
 import { sendSFDEmail } from '../lib/sfd-client.js'
 import appInsights from 'applicationinsights'
 
-export const messageType = 'reminderEmail'
+export const inboundMessageType = 'uk.gov.ffc.ahwr.agreement.reminder.email'
+export const databaseMessageType = 'reminderEmail'
 
 export const isReminderEmailMessage = (messageProperties) => {
-  return Boolean(messageProperties.type === messageType)
+  return Boolean(messageProperties.type === inboundMessageType)
 }
 
 export const processReminderEmailMessage = async (message, logger) => {
@@ -26,7 +27,7 @@ export const processReminderEmailMessage = async (message, logger) => {
     return
   }
 
-  if (await reminderEmailAlreadySent(agreementReference, messageType, reminderType)) {
+  if (await reminderEmailAlreadySent(agreementReference, databaseMessageType, reminderType)) {
     logger.info('Skipping sending reminder email, already been processed')
     return
   }
@@ -73,5 +74,5 @@ const sendMessageToSfdProxy = async ({ agreementReference, crn, sbi, emailAddres
 
 const storeMessageInDatabase = async (message) => {
   const { agreementReference } = message
-  await createMessageRequestEntry({ agreementReference, messageType, data: { ...message } })
+  await createMessageRequestEntry({ agreementReference, messageType: databaseMessageType, data: { ...message } })
 }
