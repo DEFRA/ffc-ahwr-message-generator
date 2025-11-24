@@ -93,7 +93,7 @@ describe('validateSFDSchema', () => {
     const result = validateSFDSchema(invalidEvent, mockLogger)
 
     expect(result).toBe(false)
-    expect(mockLogger.warn).toHaveBeenCalledWith(new ValidationError('\"emailAddress\" must be a valid email', []), 'Submit SFD message validation error:')
+    expect(mockLogger.warn).toHaveBeenCalledWith(new ValidationError('"emailAddress" must be a valid email', []), 'Submit SFD message validation error:')
   })
 
   test('should return false for invalid templateId', () => {

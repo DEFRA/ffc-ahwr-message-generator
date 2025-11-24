@@ -42,7 +42,7 @@ describe('sendSFDEmail', () => {
       },
       dateTime: expect.any(String)
     }, 'uk.gov.ffc.ahwr.sfd.request', expect.any(Object))
-    expect(validateSFDSchema).toHaveBeenCalledWith( {
+    expect(validateSFDSchema).toHaveBeenCalledWith({
       crn: '1100014934',
       sbi: '106705779',
       agreementReference: 'AHWR-0AD3-3322',
