@@ -1,15 +1,10 @@
 import joi from 'joi'
-import util from 'util'
 
 const nineDigitId = joi.string().pattern(/^\d{9}$/)
 const tenDigitId = joi.string().pattern(/^\d{10}$/)
-const EMAIL_MIN_LENGTH = 1
-const EMAIL_MAX_LENGTH = 320
 const email = joi
   .string()
-  .pattern(/^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/)
-  .min(EMAIL_MIN_LENGTH)
-  .max(EMAIL_MAX_LENGTH)
+  .email({ tlds: false })
 
 const CLAIM_REFERENCE_LENGTH = 14
 const submitSFDSchema = joi.object({
@@ -28,7 +23,7 @@ export const validateSFDSchema = (event, logger) => {
   const validate = submitSFDSchema.validate(event)
 
   if (validate.error) {
-    logger.warn('Submit SFD message validation error:', util.inspect(validate.error, false, null, true))
+    logger.warn(validate.error, 'Submit SFD message validation error:')
     return false
   }
   return true

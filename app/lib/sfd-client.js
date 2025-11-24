@@ -21,7 +21,7 @@ export const sendSFDEmail = async (params) => {
     dateTime: new Date().toISOString()
   }
 
-  if (validateSFDSchema(sfdMessage)) {
+  if (validateSFDSchema(sfdMessage, logger)) {
     await sendMessage(sfdMessage, sfdRequestMsgType, sfdMessageQueue)
     logger.info('Sent SFD message')
   } else {

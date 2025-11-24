@@ -1,4 +1,5 @@
 import { validateSFDSchema } from '../../../../app/messaging/schema/submit-sfd-schema'
+import { ValidationError } from 'joi'
 
 const mockLogger = {
   warn: jest.fn()
@@ -92,6 +93,7 @@ describe('validateSFDSchema', () => {
     const result = validateSFDSchema(invalidEvent, mockLogger)
 
     expect(result).toBe(false)
+    expect(mockLogger.warn).toHaveBeenCalledWith(new ValidationError('\"emailAddress\" must be a valid email', []), 'Submit SFD message validation error:')
   })
 
   test('should return false for invalid templateId', () => {
