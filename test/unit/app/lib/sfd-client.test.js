@@ -42,6 +42,19 @@ describe('sendSFDEmail', () => {
       },
       dateTime: expect.any(String)
     }, 'uk.gov.ffc.ahwr.sfd.request', expect.any(Object))
+    expect(validateSFDSchema).toHaveBeenCalledWith({
+      crn: '1100014934',
+      sbi: '106705779',
+      agreementReference: 'AHWR-0AD3-3322',
+      claimReference: 'TEMP-O9UD-22F6',
+      notifyTemplateId: 'template-123',
+      emailAddress: 'test@example.com',
+      dateTime: expect.any(String),
+      customParams: {
+        agreementReference: 'AHWR-0AD3-3322',
+        claimReference: 'TEMP-O9UD-22F6'
+      }
+    }, mockLogger)
   })
 
   test('should not send a message if validation fails', async () => {
