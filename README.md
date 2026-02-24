@@ -1,3 +1,5 @@
+# ⚠️ Note this repository is being archived, and is replaced by the backend service at https://github.com/DEFRA/ahwr-message-generator-backend/ ⚠️
+
 # FCP Template Node
 
 Template to support rapid delivery of microservices for FCP Platform. It contains the configuration needed to deploy a simple Hapi Node server to the Azure Kubernetes Platform.
